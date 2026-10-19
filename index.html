@@ -4,8 +4,9 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Inventario">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="icon" type="image/png" href="icono-thundercat.png">
-<link rel="apple-touch-icon" href="icono-thundercat.png">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 <link rel="manifest" href="manifest.webmanifest">
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,-apple-system,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
 </head><body>
@@ -227,6 +228,16 @@ textarea,.add input,.add button,.adm-row input.nm,.adm-row select,.add select,.i
 .kind{border-radius:0}
 .btl{border-radius:0}
 
+.legal{text-align:center;color:var(--muted);font-family:var(--cond);font-weight:500;font-size:12px;letter-spacing:.03em;line-height:1.5;padding:22px 8px 4px;text-transform:uppercase}
+.legal{cursor:pointer;background:none;border:0;width:100%;display:block}
+.legal u{color:var(--accent);text-decoration-thickness:2px;text-underline-offset:3px}
+.legal:hover u{color:var(--fg)}
+.lictext{overflow:auto;flex:1;min-height:0;font-size:14px;line-height:1.55;border:2px solid var(--fg);padding:4px 14px 12px;background:var(--bg)}
+.lictext h4{font-family:var(--display);font-weight:400;font-size:21px;letter-spacing:.04em;margin:14px 0 2px;color:var(--accent)}
+.lictext p{margin:4px 0}
+.lictext ul{margin:4px 0;padding-left:20px}
+.lictext li{margin:2px 0}
+#licSheet .card{max-height:90%}
 /* ---- Menú: botones centrados y con movimiento ---- */
 body.home header{background:var(--head);color:var(--head-fg)}
 body.home header{box-shadow:inset 0 -3px 0 var(--accent)}
@@ -273,6 +284,7 @@ header:hover .logo{transform:rotate(-6deg) scale(1.06)}
   <div class="adminbar" id="adminBar" hidden></div>
   <div id="confirmBox" hidden></div>
   <div id="view"></div>
+  <footer><button type="button" class="legal" id="legalBtn">© 2026 Saul Andujar · Todos los derechos reservados<br>Uso autorizado a Thundercat Club. Prohibida su copia, modificación o distribución sin permiso del autor.<br><u>Ver licencia</u></button></footer>
 </div>
 
 <div class="bar" id="bar"><div class="in">
@@ -302,6 +314,28 @@ header:hover .logo{transform:rotate(-6deg) scale(1.06)}
       <button class="sec" id="pwCancel" type="button">Cancelar</button>
       <button class="primary" id="pwOk" type="button">Entrar</button>
     </div>
+  </div>
+</div>
+<div class="sheet" id="licSheet" hidden>
+  <div class="card">
+    <h3>Licencia de uso</h3>
+    <div class="lictext"><p>Copyright © 2026 Saul Andujar. Todos los derechos reservados.</p>
+<h4>1. Autoría y titularidad</h4>
+<p>Esta aplicación (&quot;Inventario&quot;), incluido su código fuente, diseño, estructura, textos y funcionamiento, ha sido creada por Saul Andujar (en adelante, &quot;el Autor&quot;), quien es titular de todos los derechos de propiedad intelectual sobre la misma, de acuerdo con el Real Decreto Legislativo 1/1996, de 12 de abril, por el que se aprueba el texto refundido de la Ley de Propiedad Intelectual.</p>
+<p>La aplicación fue desarrollada por iniciativa propia del Autor, con sus propios medios y fuera de las funciones propias de su puesto de trabajo.</p>
+<h4>2. Permiso de uso</h4>
+<p>El Autor concede a Thundercat Club un permiso de uso gratuito, no exclusivo, intransferible y revocable, limitado exclusivamente a utilizar la aplicación para el control interno de existencias del local.</p>
+<p>Este permiso NO incluye:</p>
+<ul><li>Copiar, descargar o reproducir la aplicación, total o parcialmente.</li><li>Modificar, adaptar, traducir o crear versiones derivadas.</li><li>Distribuir, publicar, ceder, sublicenciar o vender la aplicación.</li><li>Alojarla en servidores, dominios o cuentas distintos de los del Autor.</li></ul>
+<h4>3. Revocación</h4>
+<p>El Autor podrá revocar este permiso en cualquier momento, mediante aviso por escrito (incluido correo electrónico o mensaje). Desde la revocación, deberá cesar todo uso de la aplicación y eliminarse cualquier copia que se hubiera realizado.</p>
+<h4>4. Marcas y logotipos</h4>
+<p>El nombre &quot;Thundercat&quot;, su logotipo y demás signos distintivos pertenecen a sus respectivos titulares. Su presencia en la aplicación no otorga al Autor derecho alguno sobre ellos, ni otorga a terceros derecho alguno sobre la aplicación.</p>
+<h4>5. Sin garantía</h4>
+<p>La aplicación se proporciona &quot;tal cual&quot;, sin garantías de ningún tipo. El Autor no será responsable de errores en los recuentos ni de los daños que pudieran derivarse de su uso.</p>
+<h4>6. Reserva de derechos</h4>
+<p>Cualquier uso no autorizado expresamente en esta licencia queda prohibido. Para cualquier otro uso, es necesario el permiso previo y por escrito del Autor.</p></div>
+    <button class="primary" id="licClose" type="button">Cerrar</button>
   </div>
 </div>
 <div class="toast" id="toast" hidden></div>
@@ -933,6 +967,9 @@ $("resetBtn").onclick=()=>{
     save(); b.hidden=true; render(); toast("Listo para el próximo finde");
   };
 };
+$("licClose").onclick=()=>$("licSheet").hidden=true;
+$("licSheet").onclick=e=>{if(e.target.id==="licSheet")e.target.hidden=true};
+$("legalBtn").onclick=()=>{$("licSheet").hidden=false; $("licSheet").querySelector(".lictext").scrollTop=0;};
 render();
 startDb();
 </script>
