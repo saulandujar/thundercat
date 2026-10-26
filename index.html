@@ -8,6 +8,10 @@
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 <link rel="manifest" href="manifest.webmanifest">
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>window.FIREBASE_CONFIG={"apiKey": "AIzaSyD_bRMshFXppkrlHyXO6QyfopM-QqSW6Ik", "authDomain": "thundercat-9ea18.firebaseapp.com", "projectId": "thundercat-9ea18", "storageBucket": "thundercat-9ea18.firebasestorage.app", "messagingSenderId": "138817687285", "appId": "1:138817687285:web:f9b7f7a2f9090e2385ffbc"};</script>
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,-apple-system,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
 </head><body>
 <title>Inventario Thundercat</title>
@@ -450,11 +454,30 @@ async function pushConf(){
   pushing=false; renderAdminBar();
   if(pushAgain){pushAgain=false; pushConf();}
 }
+/* Base de datos: Firebase en la versión de GitHub, la de claude.ai aquí */
+function fbShim(fs){return {doc(p){const r=fs.doc(p); return {
+  get:()=>r.get(),
+  set:d=>r.set(d),
+  update:d=>r.set(d,{merge:true}),
+  onSnapshot:(n,e)=>r.onSnapshot(n,e)
+};}};}
+async function getDb(){
+  if(window.FIREBASE_CONFIG&&window.firebase){
+    if(!firebase.apps.length) firebase.initializeApp(window.FIREBASE_CONFIG);
+    const fs=firebase.firestore();
+    try{ await fs.enablePersistence({synchronizeTabs:true}); }catch(e){}
+    await firebase.auth().signInAnonymously();
+    return fbShim(fs);
+  }
+  if(window.claude&&window.claude.use) return await window.claude.use("db");
+  return null;
+}
 async function startDb(){
   try{
-    if(!window.claude||!window.claude.use) return;
-    const db=await window.claude.use("db"); if(!db) return;
+    const db=await getDb(); if(!db) return;
     dbRef=db.doc("config/main"); sync="ok"; renderAdminBar();
+    startCounts(db);
+    try{const first=await dbRef.get(); if(!first.exists) await dbRef.set(clone(C));}catch(e){}
     dbRef.onSnapshot(snap=>{
       if(!snap.exists||snap.metadata.hasPendingWrites||pushing) return;
       const remote=normConf(clone(snap.data())), j=JSON.stringify(remote);
@@ -464,6 +487,92 @@ async function startDb(){
       render();
     },()=>{dbRef=null; sync="local"; renderAdminBar();});
   }catch(e){}
+}
+
+
+/* ---------- Inventario en común ----------
+   Cada zona (almacén, barra 1, barra 2) es un documento compartido.
+   Se envían solo los cambios, así dos personas pueden contar a la vez. */
+const AREAS={alm:"inv/almacen", b1:"inv/barra1", b2:"inv/barra2"};
+const MAPS=["q","alc","nev"];
+let cdb=null, live=false, dragging=false;
+const cnt={}; for(const k in AREAS) cnt[k]={ref:null, base:null, busy:false, again:false, full:false, noteTimer:null};
+function areaObj(k){return k==="alm"?L.alm:L.barras[k==="b1"?1:2];}
+function setArea(k,v){if(k==="alm") L.alm=v; else L.barras[k==="b1"?1:2]=v;}
+function emptyOf(k){return k==="alm"?emptyAlm():emptyBarra();}
+function curArea(){return V.screen==="barra"?(V.b===1?"b1":"b2"):"alm";}
+function normArea(k,d){
+  const o=Object.assign(emptyOf(k),clone(d||{}));
+  MAPS.forEach(m=>{if(o[m]){for(const key of Object.keys(o[m])) if(o[m][key]==null) delete o[m][key];}});
+  if(!Array.isArray(o.notes)) o.notes=[];
+  if(typeof o.noteText!=="string") o.noteText="";
+  return o;
+}
+function diffArea(a,b){
+  const p={}; let n=0, dotted=false;
+  for(const f of new Set([...Object.keys(a),...Object.keys(b)])){
+    if(MAPS.includes(f)){
+      const A=a[f]||{}, B=b[f]||{};
+      for(const key of new Set([...Object.keys(A),...Object.keys(B)])){
+        if(JSON.stringify(A[key])!==JSON.stringify(B[key])){
+          (p[f]=p[f]||{})[key]=B[key]===undefined?null:clone(B[key]); n++;
+          if(key.includes(".")) dotted=true;
+        }
+      }
+    } else if(JSON.stringify(a[f])!==JSON.stringify(b[f])){p[f]=b[f]===undefined?null:clone(b[f]); n++;}
+  }
+  return n?{p,dotted}:null;
+}
+function syncCounts(){
+  if(!cdb) return;
+  for(const k in AREAS){
+    const c=cnt[k]; if(!c.ref||c.base==null) continue;
+    const cur=areaObj(k);
+    if(c.full){ c.base=clone(cur); pushArea(k,null); continue; }
+    const d=diffArea(c.base,cur); if(!d) continue;
+    c.base=clone(cur); pushArea(k,d.dotted?null:d.p);
+  }
+}
+async function pushArea(k,patch){
+  const c=cnt[k];
+  if(c.busy){c.again=true; if(!patch) c.full=true; return;}
+  c.busy=true; c.full=false;
+  try{
+    if(patch){
+      try{ await c.ref.update(patch); }
+      catch(e){ if(e&&e.code==="invalid_argument") await c.ref.set(clone(areaObj(k))); else throw e; }
+    } else await c.ref.set(clone(areaObj(k)));
+  }catch(e){
+    toast(e&&e.code==="quota_exceeded"?"No hay espacio para guardar":"No se ha guardado para todos. Pide permiso para usar la app.");
+  }
+  c.busy=false;
+  if(c.again){c.again=false; syncCounts();}
+}
+function applyRemote(k,snap){
+  const c=cnt[k];
+  if(snap.metadata.hasPendingWrites||c.busy||c.again) return;
+  const remote=snap.exists?normArea(k,snap.data()):emptyOf(k);
+  const local=areaObj(k);
+  // si esta persona está escribiendo una nota, no se la pisamos
+  const ta=document.getElementById("noteText");
+  if(c.noteTimer||(ta&&document.activeElement===ta&&curArea()===k)) remote.noteText=local.noteText;
+  if(JSON.stringify(remote)===JSON.stringify(local)){c.base=clone(remote); return;}
+  setArea(k,remote); c.base=clone(remote); save();
+  if(!dragging) render();
+}
+async function startCounts(db){
+  cdb=db;
+  for(const k in AREAS){
+    const c=cnt[k]; c.ref=db.doc(AREAS[k]);
+    try{
+      const snap=await c.ref.get();
+      const remote=snap.exists?normArea(k,snap.data()):emptyOf(k);
+      setArea(k,remote); c.base=clone(remote);
+    }catch(e){ c.ref=null; continue; }
+    c.ref.onSnapshot(sn=>applyRemote(k,sn),()=>{c.ref=null; live=Object.values(cnt).some(x=>x.ref); render();});
+  }
+  live=Object.values(cnt).some(x=>x.ref);
+  save(); render();
 }
 
 /* ---------- Utilidades ---------- */
@@ -488,7 +597,7 @@ function outName(name,n){
 function today(){const d=new Date().toLocaleDateString("es-ES",{weekday:"long",day:"numeric",month:"long"}); return d.charAt(0).toUpperCase()+d.slice(1);}
 function el(tag,cls,html){const e=document.createElement(tag); if(cls) e.className=cls; if(html!=null) e.innerHTML=html; return e;}
 function moveIn(arr,i,d){const j=i+d; if(j<0||j>=arr.length) return; [arr[i],arr[j]]=[arr[j],arr[i]];}
-function commitAll(){save(); syncConf(); render();}
+function commitAll(){save(); syncConf(); syncCounts(); render();}
 
 function stepper(v,step,id,label,onSet){
   const st=el("div","step");
@@ -553,7 +662,7 @@ function adminItem(o){
 /* ---------- Pantallas ---------- */
 function render(){
   const focusId=document.activeElement&&document.activeElement.id;
-  $("date").textContent=today();
+  $("date").textContent=today()+(live?" · ⚡ En común":"");
   const v=$("view"); v.innerHTML=""; v.style.cssText="display:flex;flex-direction:column;gap:18px";
   const working=V.screen==="almacen"||V.screen==="barra";
   $("hbtns").hidden=!working; $("bar").hidden=!working;
@@ -741,7 +850,7 @@ function notesSection(st){
   ns.appendChild(ch);
   if(admin) ns.appendChild(addBox("add-note","Nueva nota rápida…",v=>{if(C.presets.includes(v)) return false; C.presets.push(v);}));
   const ta=document.createElement("textarea"); ta.id="noteText"; ta.placeholder="Otra cosa que quieras decirle…"; ta.value=st.noteText;
-  ta.oninput=()=>{st.noteText=ta.value; save();};
+  ta.oninput=()=>{st.noteText=ta.value; save(); const c=cnt[curArea()]; clearTimeout(c.noteTimer); c.noteTimer=setTimeout(()=>{c.noteTimer=null; syncCounts();},700);};
   ns.appendChild(ta); return ns;
 }
 function notesLines(st){
@@ -874,9 +983,10 @@ function bottleCard(cat,name){
     const show=val=>{const yy=liqY(val); liq.setAttribute("y",yy); liq.setAttribute("height",150-yy); lab.textContent=val+"%"; card.classList.add("set");};
     const fromEvent=e=>{const rc=svg.getBoundingClientRect(); const yy=(e.clientY-rc.top)/rc.height*150; return Math.max(0,Math.min(100,Math.round((BOT-yy)/(BOT-TOP)*100/5)*5));};
     let cur=p, drag=false;
+    svg.addEventListener("pointerdown",()=>{dragging=true;});
     svg.addEventListener("pointerdown",e=>{drag=true; svg.setPointerCapture(e.pointerId); cur=fromEvent(e); show(cur); e.preventDefault();});
     svg.addEventListener("pointermove",e=>{if(drag){cur=fromEvent(e); show(cur);}});
-    const end=()=>{if(drag){drag=false; commit(cur);}};
+    const end=()=>{dragging=false; if(drag){drag=false; commit(cur);}};
     svg.addEventListener("pointerup",end); svg.addEventListener("pointercancel",end);
     svg.addEventListener("keydown",e=>{
       const k={ArrowUp:5,ArrowRight:5,ArrowDown:-5,ArrowLeft:-5}[e.key]; if(k==null) return;
@@ -960,10 +1070,11 @@ $("backBtn").onclick=()=>go(V.screen==="barra"?"barras":"home");
 $("resetBtn").onclick=()=>{
   const b=$("confirmBox"), where=V.screen==="barra"?"la barra "+V.b:"el almacén";
   b.className="confirm"; b.hidden=false;
-  b.innerHTML=`<span>¿Borrar todo lo marcado en ${where}? Las listas de productos se quedan igual.</span><button type="button" id="no">Cancelar</button><button type="button" class="yes" id="yes">Borrar</button>`;
+  b.innerHTML=`<span>¿Borrar todo lo marcado en ${where}${live?" para todos":""}? Las listas de productos se quedan igual.</span><button type="button" id="no">Cancelar</button><button type="button" class="yes" id="yes">Borrar</button>`;
   b.querySelector("#no").onclick=()=>b.hidden=true;
   b.querySelector("#yes").onclick=()=>{
     if(V.screen==="barra") L.barras[V.b]=emptyBarra(); else L.alm=emptyAlm();
+    const c=cnt[curArea()]; if(c.ref){c.full=true; syncCounts();}
     save(); b.hidden=true; render(); toast("Listo para el próximo finde");
   };
 };
