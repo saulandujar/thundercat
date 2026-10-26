@@ -301,6 +301,13 @@ header .htext{flex:1 1 120px}
 .editacts{display:flex;gap:8px;flex-wrap:wrap}
 .editacts>*{flex:1 1 120px;height:44px}
 .editacts .sec{background:transparent;color:inherit;border-color:currentColor}
+.lastsent{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+.lastsent .ls{background:var(--sub-bg);color:var(--sub-fg);padding:9px 12px;display:flex;flex-direction:column;gap:2px;border-left:4px solid var(--accent)}
+.lastsent .ls b{font-family:var(--display);font-weight:400;font-size:22px;letter-spacing:.03em;line-height:1}
+.lastsent .ls span{font-family:var(--cond);font-weight:600;font-size:13px;text-transform:uppercase;letter-spacing:.02em;opacity:.85}
+.lastsent .ls.none{border-left-color:var(--line)}
+.mine{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;background:var(--amber-soft);border:2px solid var(--fg);padding:8px 10px 8px 12px;font-family:var(--cond);font-weight:600;text-transform:uppercase;letter-spacing:.03em;font-size:14px}
+.mine .chip{padding:6px 12px;font-size:13px}
 /* ---- Menú: botones centrados y con movimiento ---- */
 body.home header{background:var(--head);color:var(--head-fg)}
 body.home header{box-shadow:inset 0 -3px 0 var(--accent)}
@@ -921,7 +928,14 @@ function setAq(g,n,v){if(v>0)A().q[g+"|"+n]=v; else delete A().q[g+"|"+n];}
 function allGroups(){const out=[]; C.cfg.alm.forEach(s=>s.groups.forEach(g=>out.push({g,s}))); return out;}
 function findGroup(id){return allGroups().find(x=>x.g.id===id);}
 
-function presBanner(v){const o=others(presArea()); if(o.length&&!admin) v.appendChild(el("div","pres","👥 También contando aquí: <b>"+o.map(esc).join(", ")+"</b>"));}
+function lastSentBanner(v){
+  if(EDIT||admin) return;
+  const r=recentReg(curArea()); if(!r) return;
+  const b=el("div","mine",`<span>📤 Tu último envío: <b>${hhmm(r.ts)}</b>${r.editadoTs?" (corregido)":""}</span>`);
+  const ed=el("button","chip","✏️ Corregir"); ed.type="button"; ed.onclick=()=>startEdit(r);
+  b.appendChild(ed); v.appendChild(b);
+}
+function presBanner(v){lastSentBanner(v); const o=others(presArea()); if(o.length&&!admin) v.appendChild(el("div","pres","👥 También contando aquí: <b>"+o.map(esc).join(", ")+"</b>"));}
 function renderAlmacen(v){
   presBanner(v);
   toolbar(v,"Buscar en el almacén…");
@@ -1318,14 +1332,15 @@ function setSendMode(who){
 function openSend(){
   const area=curArea();
   $("sendTitle").textContent="Enviar "+AREA_NAME[area].toLowerCase()+": ¿quién lo envía?";
-  const miss=missingGroups(area), w=$("sendWarn");
-  w.hidden=!miss.length;
-  if(miss.length) w.innerHTML="<span>⚠️ <b>Sin contar:</b> "+miss.map(esc).join(", ")+". ¿Seguro que está todo?</span>";
+  const miss=missingGroups(area), w=$("sendWarn"), o=others(area), msgs=[];
+  if(miss.length) msgs.push("⚠️ <b>Sin contar:</b> "+miss.map(esc).join(", ")+". ¿Seguro que está todo?");
+  if(o.length) msgs.push("👥 <b>"+o.map(esc).join(", ")+"</b> también está contando aquí. Al registrar, la tabla se pone a 0 para todos.");
+  w.hidden=!msgs.length; w.innerHTML="<span>"+msgs.join("<br>")+"</span>";
   if(!C.people.includes(sendName)&&!sendName) sendName=C.people[0]||"";
   setSendMode(false);
   const rr=recentReg(area);
   $("updBtn").hidden=!rr;
-  if(rr) $("updBtn").textContent="Actualizar mi registro de las "+hhmm(rr.ts);
+  if(rr) $("updBtn").textContent="Añadir a mi registro de las "+hhmm(rr.ts);
   $("regBtn").textContent=rr?"Registrar como nuevo":"Registrar";
   $("regBtn").className=rr?"sec":"primary";
   $("otherName").value=C.people.includes(sendName)?"":sendName; renderPeople(); $("sendSheet").hidden=false;
@@ -1350,9 +1365,24 @@ async function registrar(){
   $("regBtn").disabled=true;
   try{
     await DB.collection("registros").add({area, nombre:n, dev:devId, ts:Date.now(), msg:text, data:clone(areaObj(area))});
-    $("sendSheet").hidden=true; toast("Registrado ✓ El encargado ya lo puede ver");
+    $("sendSheet").hidden=true; clearArea(area); render(); toast("Registrado ✓ La tabla se ha puesto a 0");
   }catch(e){ toast("No se ha podido registrar. Revisa la conexión o los permisos."); }
   $("regBtn").disabled=false;
+}
+function clearArea(area){
+  const c=cnt[area];
+  setArea(area,emptyOf(area)); prevArea[area]=emptyOf(area); undo[area]=[];
+  if(c.ref){c.full=true; syncCounts();}
+  save();
+}
+function msgFor(area,data,nombre,ts){const keep=areaObj(area); setArea(area,data); try{return buildMessage(area,nombre,ts);}finally{setArea(area,keep);}}
+function mergeArea(k,base,add){
+  const o=normArea(k,base);
+  MAPS.forEach(f=>{o[f]=Object.assign(o[f]||{},clone(add[f]||{}));});
+  if(add.friaMode) o.friaMode=add.friaMode;
+  (add.notes||[]).forEach(n=>{if(!o.notes.includes(n)) o.notes.push(n);});
+  if((add.noteText||"").trim()) o.noteText=[o.noteText,add.noteText].filter(x=>(x||"").trim()).join("\n");
+  return o;
 }
 function recentReg(area){
   const now=Date.now();
@@ -1360,9 +1390,9 @@ function recentReg(area){
 }
 function hhmm(ts){return new Date(ts).toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit"});}
 function regDoc(r,patch){const o=Object.assign({},r,patch); delete o.id; return o;}
-async function saveReg(r,area,n,verb){
-  const data=clone(areaObj(area));
-  const msg=buildMessage(area,r.nombre,r.ts)+`\n\n✏️ ${verb} por ${n} · ${fmtTs(Date.now())}`;
+async function saveReg(r,area,n,verb,data){
+  data=data||clone(areaObj(area));
+  const msg=msgFor(area,data,r.nombre,r.ts)+`\n\n✏️ ${verb} por ${n} · ${fmtTs(Date.now())}`;
   await DB.collection("registros").doc(r.id).set(regDoc(r,{data,msg,editadoPor:n,editadoTs:Date.now(),ediciones:(r.ediciones||0)+1}));
 }
 async function actualizarReg(){
@@ -1371,7 +1401,11 @@ async function actualizarReg(){
   if(!r){registrar(); return;}
   if(!DB){toast("Sin conexión: no se puede guardar ahora"); return;}
   $("updBtn").disabled=true;
-  try{ await saveReg(r,area,n,"Actualizado"); $("sendSheet").hidden=true; toast("Registro actualizado ✓"); }
+  try{
+    const merged=mergeArea(area,r.data,areaObj(area));
+    await saveReg(r,area,n,"Añadido",merged);
+    $("sendSheet").hidden=true; clearArea(area); render(); toast("Añadido a tu registro ✓ La tabla se ha puesto a 0");
+  }
   catch(e){ toast("No se ha podido actualizar. Revisa la conexión."); }
   $("updBtn").disabled=false;
 }
@@ -1380,7 +1414,7 @@ async function actualizarReg(){
 function startEdit(r){
   if(EDIT) endEdit();
   const k=r.area, c=cnt[k];
-  EDIT={r, k, backup:clone(areaObj(k))};
+  EDIT={r, k, backup:clone(areaObj(k)), from:V.screen};
   c.paused=true; undo[k]=[];
   setArea(k,normArea(k,r.data)); prevArea[k]=clone(areaObj(k));
   pushPres(true);
@@ -1393,7 +1427,8 @@ function endEdit(){
   setArea(k,backup); c.base=clone(backup); prevArea[k]=clone(backup); c.paused=false; c.full=false; undo[k]=[];
   EDIT=null; save();
 }
-function cancelEdit(){const id=EDIT&&EDIT.r.id; endEdit(); V.openReg=id; go("encargado",{etab:"registros"}); toast("Corrección cancelada");}
+function backFromEdit(from,id){if(from==="encargado"){V.openReg=id; go("encargado",{etab:"registros"});} else render();}
+function cancelEdit(){const id=EDIT&&EDIT.r.id, from=EDIT&&EDIT.from; endEdit(); backFromEdit(from,id); toast("Corrección cancelada");}
 async function saveEdit(){
   if(!EDIT) return;
   if(!sendName){openWho(); return;}
@@ -1401,7 +1436,7 @@ async function saveEdit(){
   const {r,k}=EDIT;
   try{ await saveReg(r,k,sendName,"Corregido"); }
   catch(e){ toast("No se ha podido guardar la corrección"); return; }
-  endEdit(); V.openReg=r.id; go("encargado",{etab:"registros"}); toast("Corrección guardada ✓");
+  const from=EDIT.from; endEdit(); backFromEdit(from,r.id); toast("Corrección guardada ✓");
 }
 function editBanner(v){
   if(!EDIT) return;
@@ -1494,15 +1529,20 @@ function renderEncargado(v){
   });
   v.appendChild(tabs);
   if(V.etab==="registros") return renderRegistros(v);
-  let any=false;
+  const last=k=>REG.find(r=>r.area===k&&r.data)||null;
+  const RA=last("alm"), R1=last("b1"), R2=last("b2");
+  const sentTxt=r=>r?`Enviado ${fmtTs(r.ts)} · ${r.nombre||"—"}${r.editadoTs?" · ✏️ corregido":""}`:"Sin envíos todavía";
+  const info=el("div","lastsent");
+  [["Almacén",RA],["Barra 1",R1],["Barra 2",R2]].forEach(([t,r])=>info.appendChild(el("div","ls"+(r?"":" none"),`<b>${t}</b><span>${esc(sentTxt(r))}</span>`)));
+  v.appendChild(info);
   // Almacén
-  const at=almTable(L.alm);
-  const sa=el("section",null,shead("Almacén","Lo contado ahora mismo",at.n));
-  if(at.n){any=true; sa.appendChild(at.box);}
-  else sa.appendChild(el("div","empty","Todavía no se ha contado nada en el almacén."));
+  const XA=RA?normArea("alm",RA.data):emptyAlm();
+  const at=almTable(XA);
+  const sa=el("section",null,shead("Almacén",RA?"Último envío":"",at.n));
+  sa.appendChild(at.n?at.box:el("div","empty",RA?"El último envío del almacén estaba vacío.":"Todavía no se ha enviado el almacén."));
   v.appendChild(sa);
-  // Botellas
-  const B1=L.barras[1], B2=L.barras[2];
+  // Botellas (suma del último envío de cada barra)
+  const B1=R1?normArea("b1",R1.data):emptyBarra(), B2=R2?normArea("b2",R2.data):emptyBarra();
   const sb=el("section");
   let nb=0; const body=el("div");
   for(const c of C.cfg.cats){
@@ -1514,8 +1554,8 @@ function renderEncargado(v){
       body.appendChild(el("div","trow"+(eq===0?" zero":""),`<span class="name">${esc(n)}</span><span>${bottleCell(B1.alc[n])}</span><span>${bottleCell(B2.alc[n])}</span><span class="tt">${eq===0?"❌ 0":"≈ "+fmtEq(eq)}</span>`));
     });
   }
-  sb.innerHTML=shead("Botellas","Llenas + abiertas · total en botellas aprox.",nb);
-  if(nb){any=true; sb.appendChild(body);} else sb.appendChild(el("div","empty","Todavía no se han contado botellas."));
+  sb.innerHTML=shead("Botellas","Último envío de cada barra · total en botellas aprox.",nb);
+  sb.appendChild(nb?body:el("div","empty",(R1||R2)?"Los últimos envíos de las barras no tienen botellas.":"Todavía no se ha enviado ninguna barra."));
   v.appendChild(sb);
   // Neveras
   const sn=el("section"); const nbody=el("div"); let nn=0;
@@ -1526,17 +1566,17 @@ function renderEncargado(v){
     names.forEach(n=>{nn++; const a=B1.nev[n]||0, b=B2.nev[n]||0;
       nbody.appendChild(el("div","trow",`<span class="name">${esc(n)}</span><span>${a||"—"}</span><span>${b||"—"}</span><span class="tt">${a+b}</span>`));});
   });
-  sn.innerHTML=shead("Neveras","Suma de las dos barras",nn);
-  if(nn){any=true; sn.appendChild(nbody);} else sn.appendChild(el("div","empty","Todavía no se han contado las neveras."));
+  sn.innerHTML=shead("Neveras","Suma del último envío de cada barra",nn);
+  sn.appendChild(nn?nbody:el("div","empty",(R1||R2)?"Los últimos envíos de las barras no tienen neveras.":"Todavía no se ha enviado ninguna barra."));
   v.appendChild(sn);
   // Notas
   const notes=[];
-  [["Almacén",L.alm],["Barra 1",B1],["Barra 2",B2]].forEach(([t,x])=>{
-    const l=[...x.notes]; if(x.noteText.trim()) l.push(x.noteText.trim());
+  [["Almacén",XA],["Barra 1",B1],["Barra 2",B2]].forEach(([t,x])=>{
+    const l=[...(x.notes||[])]; if((x.noteText||"").trim()) l.push(x.noteText.trim());
     l.forEach(z=>notes.push(`<b>${t}:</b> ${esc(z)}`));
   });
   if(notes.length){const s=el("section",null,shead("Notas","",notes.length)); s.appendChild(el("div","notes-ro",notes.map(n=>`<p>${n}</p>`).join(""))); v.appendChild(s);}
-  if(!live) v.prepend(el("div","confirm","<span>⚠️ Sin conexión: estás viendo solo lo que hay en este móvil.</span>"));
+  if(!DB) v.prepend(el("div","confirm","<span>⚠️ Sin conexión: no se pueden cargar los envíos.</span>"));
 }
 function fmtTs(ts){const d=new Date(ts); return d.toLocaleDateString("es-ES",{weekday:"short",day:"numeric",month:"short"})+" · "+d.toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit"});}
 function renderRegistros(v){
