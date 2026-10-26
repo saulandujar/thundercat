@@ -267,6 +267,10 @@ pre.ro{border:0;margin:0;border-radius:0;font-size:15px}
 .who .chip{font-size:16px;padding:10px 16px}
 #sendSheet .card{max-height:none}
 #sendSheet .acts .primary{flex:1 1 140px}
+#sendActs{flex-direction:column}
+#sendActs>*{flex:none;width:100%;height:auto;min-height:50px;white-space:normal;line-height:1.05;padding:9px 12px 7px;overflow-wrap:anywhere;box-sizing:border-box}
+#updBtn{font-size:24px;display:flex;flex-direction:column;align-items:center;gap:2px}
+#updBtn small{font-family:var(--cond);font-weight:700;font-size:13px;letter-spacing:.06em;opacity:.9}
 .trow2{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:8px 10px 8px 14px;border-top:1px solid var(--line)}
 .trow2 .tt{min-width:52px;text-align:center;font-family:var(--display);font-weight:400;font-size:22px;background:var(--sub-bg);color:var(--yellow);padding:3px 8px 0;font-variant-numeric:tabular-nums}
 .trow2.wide .tt{font-family:var(--cond);font-weight:700;font-size:14px;text-transform:uppercase;letter-spacing:.02em;background:var(--chip);color:var(--fg);padding:6px 9px;max-width:62vw;text-align:right;line-height:1.2}
@@ -337,6 +341,36 @@ header:hover .logo{transform:rotate(-6deg) scale(1.06)}
 .chip:active,.tabs button:active,.add button:active,.addb:active{transform:scale(.95)}
 .step button:active{transform:scale(.88)}
 @media (prefers-reduced-motion:reduce){.tile,.tile b::after,.tile:hover::before{animation:none!important}.tile,.tile:hover,.tile:active{transform:none}}
+/* ---- Inicio más compacto y transiciones ---- */
+.tiles{max-width:380px;margin:22px auto 8px;gap:14px}
+.tile{min-height:118px;padding:18px 16px}
+.tile b{font-size:50px}
+.tile span{font-size:13px}
+.tile.small{min-height:78px;padding:12px 16px;background:var(--sub-bg);color:var(--sub-fg);border-color:var(--fg)}
+.tile.small b{font-size:32px}
+.tile.small span{color:var(--sub-fg)}
+.tile.small b::after{color:var(--yellow)}
+.tile.tap{animation:tilePress .22s cubic-bezier(.3,1.6,.5,1)}
+@keyframes tilePress{0%{transform:scale(1)}35%{transform:translate(4px,4px) scale(.97);box-shadow:1px 1px 0 var(--fg)}100%{transform:none}}
+.primary,.sec,.chip,.tabs button,.step button,.addb,.ghost{position:relative;overflow:hidden}
+.rpl{position:absolute;border-radius:50%;transform:scale(0);background:currentColor;opacity:.28;pointer-events:none;animation:rpl .55s ease-out forwards}
+@keyframes rpl{to{transform:scale(1);opacity:0}}
+#view.out-fwd{animation:outF .15s ease-in forwards}
+#view.out-back{animation:outB .15s ease-in forwards}
+#view.in-fwd{animation:inF .32s cubic-bezier(.2,.85,.25,1)}
+#view.in-back{animation:inB .32s cubic-bezier(.2,.85,.25,1)}
+@keyframes outF{to{opacity:0;transform:translateX(-28px)}}
+@keyframes outB{to{opacity:0;transform:translateX(28px)}}
+@keyframes inF{from{opacity:0;transform:translateX(36px)}}
+@keyframes inB{from{opacity:0;transform:translateX(-36px)}}
+#title.ttl-in{animation:ttlIn .32s cubic-bezier(.2,.85,.25,1)}
+@keyframes ttlIn{from{opacity:0;transform:translateY(8px)}}
+.sheet:not([hidden]){animation:fadeIn .18s ease-out}
+.sheet:not([hidden]) .card{animation:sheetUp .28s cubic-bezier(.2,.85,.25,1)}
+@keyframes fadeIn{from{opacity:0}}
+@keyframes sheetUp{from{transform:translateY(40px);opacity:.4}}
+section{animation:none}
+@media (prefers-reduced-motion:reduce){#view,#title,.sheet,.sheet .card,.tile.tap{animation:none!important}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 
@@ -756,6 +790,15 @@ function buzz(ms){
     hapt.click();
   }catch(e){}
 }
+document.addEventListener("pointerdown",e=>{
+  if(reduceMotion()) return;
+  const t=e.target.closest&&e.target.closest(".tile,.primary,.sec,.chip,.tabs button,.step button,.addb,.ghost");
+  if(!t||t.disabled) return;
+  const r=t.getBoundingClientRect(), d=Math.max(r.width,r.height)*2.2;
+  const sp=document.createElement("span"); sp.className="rpl";
+  sp.style.cssText=`width:${d}px;height:${d}px;left:${e.clientX-r.left-d/2}px;top:${e.clientY-r.top-d/2}px`;
+  t.appendChild(sp); setTimeout(()=>sp.remove(),600);
+},true);
 document.addEventListener("click",e=>{
   const t=e.target.closest&&e.target.closest(".step button,.chip,.tile,.addb,.primary,.sec,.tabs button,.clr,.rm");
   if(t&&!t.disabled) buzz();
@@ -876,24 +919,44 @@ function render(){
   document.body.classList.toggle("home",V.screen==="home");
   document.body.style.paddingBottom=working?"120px":"24px";
   $("backBtn").hidden=V.screen==="home";
-  $("backBtn").textContent=V.screen==="barra"?"‹ Barras":"‹ Inicio";
-  $("title").textContent={home:"Inventario",almacen:"Almacén",barras:"Barra",barra:"Barra "+V.b,encargado:"Encargado"}[V.screen];
+  $("backBtn").textContent={inv:"‹ Inicio",encargado:"‹ Inicio",almacen:"‹ Inventario",barras:"‹ Inventario",barra:"‹ Barras"}[V.screen]||"‹ Volver";
+  const newTitle={home:"Inventario",inv:"Inventario",almacen:"Almacén",barras:"Barra",barra:"Barra "+V.b,encargado:"Encargado"}[V.screen];
+  if($("title").textContent!==newTitle){$("title").textContent=newTitle; const h=$("title"); h.classList.remove("ttl-in"); void h.offsetWidth; h.classList.add("ttl-in");}
   renderAdminBar();
   editBanner(v);
-  ({home:renderHome,almacen:renderAlmacen,barras:renderBarras,barra:renderBarra,encargado:renderEncargado})[V.screen](v);
+  ({home:renderHome,inv:renderInv,almacen:renderAlmacen,barras:renderBarras,barra:renderBarra,encargado:renderEncargado})[V.screen](v);
   if(focusId&&$(focusId)){const f=$(focusId); f.focus({preventScroll:true}); if(focusId==="search"){try{f.setSelectionRange(f.value.length,f.value.length);}catch(e){}}}
   $("undoBtn").hidden=!(working&&undo[curArea()]&&undo[curArea()].length);
   const editingHere=!!(EDIT&&working&&curArea()===EDIT.k);
   $("showBtn").textContent=editingHere?"Guardar corrección":"Enviar";
   $("resetBtn").hidden=editingHere;
 }
-function go(screen,extra){
+function goNow(screen,extra){
   if(V.screen==="encargado"&&screen!=="encargado") encOk=false;
   const changedPlace=screen!==V.screen||(extra&&extra.b&&extra.b!==V.b);
   Object.assign(V,{screen},extra||{}); if(changedPlace) V.q="";
   $("confirmBox").hidden=true; render(); window.scrollTo(0,0);
   if(isCounting()&&!sendName&&!admin) openWho();
   pushPres();
+}
+const DEPTH={home:0,inv:1,encargado:1,almacen:2,barras:2,barra:3};
+const PARENT={inv:"home",encargado:"home",almacen:"inv",barras:"inv",barra:"barras"};
+const reduceMotion=()=>{try{return matchMedia("(prefers-reduced-motion: reduce)").matches;}catch(e){return false;}};
+let navTimer=null;
+function go(screen,extra){
+  const v=$("view");
+  const same=screen===V.screen&&!(extra&&extra.b&&extra.b!==V.b);
+  if(same||reduceMotion()){goNow(screen,extra); return;}
+  const dir=(DEPTH[screen]??1)>=(DEPTH[V.screen]??1)?"fwd":"back";
+  clearTimeout(navTimer);
+  v.classList.remove("in-fwd","in-back","out-fwd","out-back"); void v.offsetWidth;
+  v.classList.add("out-"+dir);
+  navTimer=setTimeout(()=>{
+    v.classList.remove("out-fwd","out-back");
+    goNow(screen,extra);
+    void v.offsetWidth; v.classList.add("in-"+dir);
+    navTimer=setTimeout(()=>v.classList.remove("in-fwd","in-back"),420);
+  },150);
 }
 function renderAdminBar(){
   const b=$("adminBar"); b.hidden=!admin; if(!admin) return;
@@ -906,18 +969,29 @@ function renderAdminBar(){
 
 function countAlm(){return Object.keys(L.alm.q).length+(L.alm.friaMode?1:0);}
 function countBarra(b){const B=L.barras[b]; return Object.keys(B.alc).length+Object.keys(B.nev).length;}
-function tile(title,sub,main,fn){const t=el("button","tile"+(main?" main":""),`<b>${title}</b><span>${sub}</span>`); t.type="button"; t.onclick=fn; return t;}
+function tile(title,sub,main,fn,cls){
+  const t=el("button","tile"+(main?" main":"")+(cls?" "+cls:""),`<b>${title}</b><span>${sub}</span>`); t.type="button";
+  t.onclick=()=>{ if(t.classList.contains("tap")) return; t.classList.add("tap"); setTimeout(()=>{t.classList.remove("tap"); fn();},reduceMotion()?0:120); };
+  return t;
+}
 function marked(n){return n?`${n} marcado${n===1?"":"s"}`:"Sin empezar";}
 function renderHome(v){
   const t=el("div","tiles");
+  const who=["alm","b1","b2"].map(whoTxt).filter(Boolean);
+  const n=countAlm()+countBarra(1)+countBarra(2);
+  t.append(tile("Inventario","Almacén y barras · "+(n?n+" marcados":"sin empezar")+(who.length?"<br>"+esc([...new Set(who.join(", ").replace(/👤 /g,"").split(", "))].join(", "))+" contando":""),true,()=>go("inv")),
+           tile("Encargado","🔒 Total y registros",false,openEncargado,"small"));
+  v.appendChild(t);
+}
+function renderInv(v){
+  const t=el("div","tiles");
   t.append(tile("Almacén",C.cfg.alm.map(s=>s.title.toLowerCase()).join(", ")+" · "+marked(countAlm())+(whoTxt("alm")?"<br>"+esc(whoTxt("alm"))+" contando":""),true,()=>go("almacen")),
-           tile("Barra","Botellas y neveras de las barras"+((whoTxt("b1")||whoTxt("b2"))?"<br>"+[whoTxt("b1")&&esc(whoTxt("b1"))+" en B1",whoTxt("b2")&&esc(whoTxt("b2"))+" en B2"].filter(Boolean).join(" · "):""),false,()=>go("barras")),
-           tile("Encargado","🔒 Total de almacén y barras",false,openEncargado));
+           tile("Barra","Botellas y neveras"+((whoTxt("b1")||whoTxt("b2"))?"<br>"+[whoTxt("b1")&&esc(whoTxt("b1"))+" en B1",whoTxt("b2")&&esc(whoTxt("b2"))+" en B2"].filter(Boolean).join(" · "):""),true,()=>go("barras")));
   v.appendChild(t);
 }
 function renderBarras(v){
   const t=el("div","tiles");
-  [1,2].forEach(b=>t.appendChild(tile("Barra "+b,marked(countBarra(b))+(whoTxt("b"+b)?"<br>"+esc(whoTxt("b"+b))+" contando":""),b===1,()=>go("barra",{b,tab:"botellas"}))));
+  [1,2].forEach(b=>t.appendChild(tile("Barra "+b,marked(countBarra(b))+(whoTxt("b"+b)?"<br>"+esc(whoTxt("b"+b))+" contando":""),true,()=>go("barra",{b,tab:"botellas"}))));
   v.appendChild(t);
 }
 
@@ -1340,7 +1414,7 @@ function openSend(){
   setSendMode(false);
   const rr=recentReg(area);
   $("updBtn").hidden=!rr;
-  if(rr) $("updBtn").textContent="Añadir a mi registro de las "+hhmm(rr.ts);
+  if(rr) $("updBtn").innerHTML="Añadir a mi registro<small>de las "+hhmm(rr.ts)+"</small>";
   $("regBtn").textContent=rr?"Registrar como nuevo":"Registrar";
   $("regBtn").className=rr?"sec":"primary";
   $("otherName").value=C.people.includes(sendName)?"":sendName; renderPeople(); $("sendSheet").hidden=false;
@@ -1685,7 +1759,7 @@ $("sendSheet").onclick=e=>{if(e.target.id==="sendSheet")e.target.hidden=true};
 $("otherName").oninput=()=>renderPeople();
 $("closeSheet").onclick=()=>{$("sheet").hidden=true; msgText="";};
 $("sheet").onclick=e=>{if(e.target.id==="sheet")e.target.hidden=true};
-$("backBtn").onclick=()=>go(V.screen==="barra"?"barras":"home");
+$("backBtn").onclick=()=>go(PARENT[V.screen]||"home");
 $("resetBtn").onclick=()=>{
   const b=$("confirmBox"), where=V.screen==="barra"?"la barra "+V.b:"el almacén";
   b.className="confirm"; b.hidden=false;
