@@ -242,6 +242,65 @@ textarea,.add input,.add button,.adm-row input.nm,.adm-row select,.add select,.i
 .lictext ul{margin:4px 0;padding-left:20px}
 .lictext li{margin:2px 0}
 #licSheet .card{max-height:90%}
+.trow{display:grid;grid-template-columns:minmax(0,1fr) 62px 62px 66px;gap:6px;align-items:center;padding:8px 10px 8px 14px;border-top:1px solid var(--line);font-variant-numeric:tabular-nums}
+.trow>span:not(.name){text-align:center;font-family:var(--cond);font-weight:600;font-size:15px;line-height:1.15}
+.trow small{font-size:12px;color:var(--muted);font-weight:600}
+.trow .tt{font-family:var(--display);font-weight:400;font-size:22px;background:var(--sub-bg);color:var(--yellow);padding:3px 2px 0}
+.trow.zero .tt{color:var(--sub-fg)}
+.thead{background:var(--chip);border-top:0;padding-top:5px;padding-bottom:5px}
+.thead span{font-family:var(--cond);font-weight:700;text-transform:uppercase;letter-spacing:.06em;font-size:12px;color:var(--muted);text-align:center}
+.thead span:first-child{text-align:left}
+pre.ro{border:0;margin:0;border-radius:0;font-size:15px}
+.notes-ro{padding:6px 14px 10px;font-size:15px}
+.notes-ro p{margin:6px 0}
+.reg{border-top:1px solid var(--line)}
+.reg:first-of-type{border-top:0}
+.reghead{display:grid;grid-template-columns:auto minmax(0,1fr);gap:2px 10px;width:100%;text-align:left;background:transparent;border:0;padding:12px 14px}
+.reghead .ra{font-family:var(--display);font-size:22px;letter-spacing:.03em;color:var(--accent);line-height:1}
+.reghead .rn{font-family:var(--cond);font-weight:700;text-transform:uppercase;font-size:15px;align-self:center}
+.reghead .rt{grid-column:1 / -1;font-size:13px;color:var(--muted);font-family:var(--cond);font-weight:600;text-transform:uppercase;letter-spacing:.03em}
+.reg.open{background:var(--amber-soft);box-shadow:inset 4px 0 0 var(--accent)}
+.reg pre{margin:0 14px;max-height:none}
+.regacts{display:flex;gap:8px;flex-wrap:wrap;padding:10px 14px 14px}
+.regacts>*{flex:1 1 120px}
+.regacts a.wa{height:48px}
+.who .chip{font-size:16px;padding:10px 16px}
+#sendSheet .card{max-height:none}
+#sendSheet .acts .primary{flex:1 1 140px}
+.trow2{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:8px 10px 8px 14px;border-top:1px solid var(--line)}
+.trow2 .tt{min-width:52px;text-align:center;font-family:var(--display);font-weight:400;font-size:22px;background:var(--sub-bg);color:var(--yellow);padding:3px 8px 0;font-variant-numeric:tabular-nums}
+.trow2.wide .tt{font-family:var(--cond);font-weight:700;font-size:14px;text-transform:uppercase;letter-spacing:.02em;background:var(--chip);color:var(--fg);padding:6px 9px;max-width:62vw;text-align:right;line-height:1.2}
+.trow2.low .tt{background:var(--accent);color:var(--accent-fg)}
+.regbody{border-top:2px solid var(--fg);margin:0 0 4px;background:var(--surface)}
+.regbody .sub:first-child{border-top:0}
+.toolbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:4;background:var(--bg);display:flex;flex-direction:column;gap:8px;padding:8px 0;margin:-8px 0 -6px}
+.search{position:relative;display:flex}
+.search input{flex:1;min-width:0;height:46px;border:2px solid var(--fg);border-radius:0;padding:0 44px 0 40px;background:var(--surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2.5'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m20 20-4-4'/%3E%3C/svg%3E") no-repeat 12px center;color:var(--fg);font:500 16px var(--body);-webkit-appearance:none;appearance:none}
+.search input::-webkit-search-cancel-button{display:none}
+.search .sx{position:absolute;right:4px;top:4px;width:38px;height:38px;border:0;background:transparent;font-size:18px;color:var(--muted)}
+.tchips{display:flex;gap:8px;flex-wrap:wrap}
+.tchips .chip{padding:6px 12px;font-size:13px}
+.upd{display:block;font-family:var(--body);text-transform:none;letter-spacing:0;font-weight:500;font-size:12px;color:var(--muted);margin-top:1px}
+.pres{background:var(--sub-bg);color:var(--sub-fg);padding:9px 12px;font-family:var(--cond);font-weight:600;text-transform:uppercase;letter-spacing:.03em;font-size:14px;border-left:4px solid var(--yellow)}
+.empty.big{background:var(--surface);border:2px dashed var(--line);text-align:center;padding:26px 14px;font-family:var(--cond);font-weight:700;text-transform:uppercase;font-size:17px;color:var(--muted)}
+#undoBtn{flex:0 0 auto}
+#whoBtn{width:100%}
+.themebtn{flex:none;align-self:flex-start;width:42px;height:42px;border:2px solid currentColor;background:transparent;color:inherit;font-size:20px;line-height:1;display:grid;place-items:center;margin-left:auto;transition:transform .2s}
+.themebtn:active{transform:rotate(180deg) scale(.9)}
+header{flex-wrap:wrap}
+header .htext{flex:1 1 120px}
+.trow2 .vals{display:flex;align-items:center;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+.dl{font-style:normal;font-family:var(--cond);font-weight:700;font-size:13px;letter-spacing:.02em;white-space:nowrap;color:var(--muted)}
+.dl.dn{color:var(--accent)}
+.dl.up{color:#1f9d55}
+.dl.eq{color:var(--muted)}
+.cmpbar{display:flex;align-items:center;gap:10px;justify-content:space-between;flex-wrap:wrap;padding:8px 14px;background:var(--chip);font-family:var(--cond);font-weight:600;text-transform:uppercase;letter-spacing:.03em;font-size:13px;color:var(--muted)}
+.cmpbar .chip{padding:5px 11px;font-size:12px}
+.editbar{display:flex;flex-direction:column;gap:10px;background:var(--yellow);color:#140c00;padding:12px 14px;border:2px solid var(--fg);font-size:15px;line-height:1.35}
+.editbar small{font-size:12.5px;opacity:.85}
+.editacts{display:flex;gap:8px;flex-wrap:wrap}
+.editacts>*{flex:1 1 120px;height:44px}
+.editacts .sec{background:transparent;color:inherit;border-color:currentColor}
 /* ---- Menú: botones centrados y con movimiento ---- */
 body.home header{background:var(--head);color:var(--head-fg)}
 body.home header{box-shadow:inset 0 -3px 0 var(--accent)}
@@ -281,6 +340,7 @@ header:hover .logo{transform:rotate(-6deg) scale(1.06)}
       <button class="back" id="backBtn" type="button" hidden>‹ Volver</button>
       <h1 id="title">Inventario</h1><div class="date" id="date"></div>
     </div>
+    <button class="themebtn" id="themeBtn" type="button" aria-label="Cambiar tema">◐</button>
     <div class="hbtns" id="hbtns">
       <button class="ghost" id="resetBtn" type="button">Empezar de cero</button>
     </div>
@@ -292,10 +352,26 @@ header:hover .logo{transform:rotate(-6deg) scale(1.06)}
 </div>
 
 <div class="bar" id="bar"><div class="in">
-  <button class="sec" id="copyBtn" type="button">Copiar</button>
-  <button class="primary" id="showBtn" type="button">Ver mensaje</button>
+  <button class="sec" id="undoBtn" type="button" hidden>↶ Deshacer</button>
+  <button class="primary" id="showBtn" type="button">Enviar</button>
 </div></div>
 
+<div class="sheet" id="sendSheet" hidden>
+  <div class="card">
+    <h3 id="sendTitle">¿Quién lo envía?</h3>
+    <div id="sendWarn" class="confirm" hidden></div>
+    <div class="chips who" id="peopleChips"></div>
+    <input type="text" id="otherName" class="pwin" placeholder="Otro nombre" autocomplete="off">
+    <div id="peopleAdmin"></div>
+    <button class="primary" id="whoBtn" type="button" hidden>Continuar</button>
+    <div class="acts" id="sendActs">
+      <button class="primary" id="updBtn" type="button" hidden>Actualizar mi registro</button>
+      <button class="primary" id="regBtn" type="button">Registrar</button>
+      <button class="sec" id="waBtn" type="button">Copiar para WhatsApp</button>
+    </div>
+    <button class="ghost" id="sendCancel" type="button">Cancelar</button>
+  </div>
+</div>
 <div class="sheet" id="sheet" hidden>
   <div class="card">
     <h3>Mensaje para el encargado</h3>
@@ -421,10 +497,11 @@ function normConf(c){
   c.cfg.cats.forEach(x=>{if(!c.alcLists[x.id]) c.alcLists[x.id]=[];});
   c.cfg.nev.forEach(x=>{if(!c.nevLists[x.id]) c.nevLists[x.id]=[];});
   if(!Array.isArray(c.presets)) c.presets=[...NOTE_PRESETS];
+  if(!Array.isArray(c.people)) c.people=["Saul"];
   return c;
 }
-function emptyAlm(){return {q:{}, friaMode:"", notes:[], noteText:""};}
-function emptyBarra(){return {alc:{}, nev:{}, notes:[], noteText:""};}
+function emptyAlm(){return {q:{}, t:{}, friaMode:"", notes:[], noteText:""};}
+function emptyBarra(){return {alc:{}, nev:{}, t:{}, notes:[], noteText:""};}
 function loadLocal(){
   try{const r=localStorage.getItem(LKEY); if(r){const d=JSON.parse(r); return {alm:Object.assign(emptyAlm(),d.alm), barras:{1:Object.assign(emptyBarra(),d.barras&&d.barras[1]),2:Object.assign(emptyBarra(),d.barras&&d.barras[2])}};}}catch(e){}
   return {alm:emptyAlm(), barras:{1:emptyBarra(),2:emptyBarra()}};
@@ -437,6 +514,9 @@ let L=loadLocal();
 let C=loadConf();
 let V={screen:"home", b:1, tab:"botellas", cat:C.cfg.cats[0]?C.cfg.cats[0].id:""};
 let admin=false;
+try{const p=JSON.parse(localStorage.getItem("inv-prefs")||"{}"); V.hide=!!p.hide; V.alpha=!!p.alpha;}catch(e){}
+function prefs(){try{localStorage.setItem("inv-prefs",JSON.stringify({hide:V.hide,alpha:V.alpha}));}catch(e){}}
+V.q="";
 
 /* ---------- Sincronización de la configuración ---------- */
 let dbRef=null, sync="local", lastConf=JSON.stringify(C), pushTimer=null, pushing=false, pushAgain=false;
@@ -460,7 +540,7 @@ function fbShim(fs){return {doc(p){const r=fs.doc(p); return {
   set:d=>r.set(d),
   update:d=>r.set(d,{merge:true}),
   onSnapshot:(n,e)=>r.onSnapshot(n,e)
-};}};}
+};}, collection:p=>fs.collection(p)};}
 async function getDb(){
   if(window.FIREBASE_CONFIG&&window.firebase){
     if(!firebase.apps.length) firebase.initializeApp(window.FIREBASE_CONFIG);
@@ -475,6 +555,7 @@ async function getDb(){
 async function startDb(){
   try{
     const db=await getDb(); if(!db) return;
+    DB=db; startRegistros(db); startPresence(db);
     dbRef=db.doc("config/main"); sync="ok"; renderAdminBar();
     startCounts(db);
     try{const first=await dbRef.get(); if(!first.exists) await dbRef.set(clone(C));}catch(e){}
@@ -494,8 +575,8 @@ async function startDb(){
    Cada zona (almacén, barra 1, barra 2) es un documento compartido.
    Se envían solo los cambios, así dos personas pueden contar a la vez. */
 const AREAS={alm:"inv/almacen", b1:"inv/barra1", b2:"inv/barra2"};
-const MAPS=["q","alc","nev"];
-let cdb=null, live=false, dragging=false;
+const MAPS=["q","alc","nev","t"];
+let cdb=null, live=false, dragging=false, DB=null, REG=[], regReady=false, EDIT=null;
 const cnt={}; for(const k in AREAS) cnt[k]={ref:null, base:null, busy:false, again:false, full:false, noteTimer:null};
 function areaObj(k){return k==="alm"?L.alm:L.barras[k==="b1"?1:2];}
 function setArea(k,v){if(k==="alm") L.alm=v; else L.barras[k==="b1"?1:2]=v;}
@@ -526,7 +607,7 @@ function diffArea(a,b){
 function syncCounts(){
   if(!cdb) return;
   for(const k in AREAS){
-    const c=cnt[k]; if(!c.ref||c.base==null) continue;
+    const c=cnt[k]; if(!c.ref||c.base==null||c.paused) continue;
     const cur=areaObj(k);
     if(c.full){ c.base=clone(cur); pushArea(k,null); continue; }
     const d=diffArea(c.base,cur); if(!d) continue;
@@ -550,6 +631,7 @@ async function pushArea(k,patch){
 }
 function applyRemote(k,snap){
   const c=cnt[k];
+  if(c.paused){ if(EDIT&&EDIT.k===k&&!snap.metadata.hasPendingWrites) EDIT.backup=snap.exists?normArea(k,snap.data()):emptyOf(k); return; }
   if(snap.metadata.hasPendingWrites||c.busy||c.again) return;
   const remote=snap.exists?normArea(k,snap.data()):emptyOf(k);
   const local=areaObj(k);
@@ -557,8 +639,8 @@ function applyRemote(k,snap){
   const ta=document.getElementById("noteText");
   if(c.noteTimer||(ta&&document.activeElement===ta&&curArea()===k)) remote.noteText=local.noteText;
   if(JSON.stringify(remote)===JSON.stringify(local)){c.base=clone(remote); return;}
-  setArea(k,remote); c.base=clone(remote); save();
-  if(!dragging) render();
+  setArea(k,remote); c.base=clone(remote); prevArea[k]=clone(remote); save();
+  softRender();
 }
 async function startCounts(db){
   cdb=db;
@@ -567,13 +649,130 @@ async function startCounts(db){
     try{
       const snap=await c.ref.get();
       const remote=snap.exists?normArea(k,snap.data()):emptyOf(k);
-      setArea(k,remote); c.base=clone(remote);
+      setArea(k,remote); c.base=clone(remote); prevArea[k]=clone(remote);
     }catch(e){ c.ref=null; continue; }
     c.ref.onSnapshot(sn=>applyRemote(k,sn),()=>{c.ref=null; live=Object.values(cnt).some(x=>x.ref); render();});
   }
   live=Object.values(cnt).some(x=>x.ref);
   save(); render();
 }
+
+/* ---------- Comodidades: deshacer, recientes, quién y cuándo ---------- */
+const prevArea={}, undo={}, recent={};
+for(const k of ["alm","b1","b2"]) prevArea[k]=clone(areaObj(k));
+const nrm=x=>String(x).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"");
+function isTyping(){const a=document.activeElement; return !!a&&(a.tagName==="TEXTAREA"||(a.tagName==="INPUT"&&a.type==="text"));}
+function softRender(){if(!dragging&&!isTyping()) render();}
+function isCounting(){return V.screen==="almacen"||V.screen==="barra";}
+function changedKeys(prev,cur){
+  const out=[];
+  for(const f of ["q","alc","nev"]){const A=prev[f]||{},B=cur[f]||{}; for(const key of new Set([...Object.keys(A),...Object.keys(B)])) if(JSON.stringify(A[key])!==JSON.stringify(B[key])) out.push(f+":"+key);}
+  return out;
+}
+function otherChanged(prev,cur){return ["friaMode","notes","noteText"].some(x=>JSON.stringify(prev[x])!==JSON.stringify(cur[x]));}
+function trackChange(){
+  if(!isCounting()) return;
+  const k=curArea(), cur=areaObj(k), prev=prevArea[k];
+  if(!prev){prevArea[k]=clone(cur); return;}
+  const keys=changedKeys(prev,cur), other=otherChanged(prev,cur);
+  if(!keys.length&&!other) return;
+  (undo[k]=undo[k]||[]).push({prev, keys, other}); if(undo[k].length>40) undo[k].shift();
+  const now=Date.now(); cur.t=cur.t||{};
+  keys.forEach(fk=>{recent[fk]=now; cur.t[fk]={n:sendName||"",ts:now};});
+  if(prev.friaMode!==cur.friaMode) recent.fria=now;
+  if(keys.length||prev.friaMode!==cur.friaMode){clearTimeout(trackChange.t); trackChange.t=setTimeout(softRender,10500);}
+  prevArea[k]=clone(cur);
+}
+function doUndo(){
+  const k=curArea(), st=undo[k]; if(!st||!st.length) return;
+  const e=st.pop(), cur=areaObj(k); cur.t=cur.t||{};
+  e.keys.forEach(fk=>{
+    const i=fk.indexOf(":"), f=fk.slice(0,i), key=fk.slice(i+1);
+    cur[f]=cur[f]||{};
+    if(e.prev[f]&&e.prev[f][key]!==undefined) cur[f][key]=clone(e.prev[f][key]); else delete cur[f][key];
+    if(e.prev.t&&e.prev.t[fk]) cur.t[fk]=clone(e.prev.t[fk]); else delete cur.t[fk];
+  });
+  if(e.other) ["friaMode","notes","noteText"].forEach(x=>cur[x]=clone(e.prev[x]));
+  prevArea[k]=clone(cur); save(); syncCounts(); render(); toast("Deshecho");
+}
+function pushUndoReset(k,old){
+  const keys=changedKeys(old,emptyOf(k));
+  (undo[k]=undo[k]||[]).push({prev:clone(old), keys, other:true});
+  prevArea[k]=emptyOf(k);
+}
+function agoTxt(ts){const m=Math.floor((Date.now()-ts)/60000); if(m<1) return "ahora"; if(m<60) return "hace "+m+" min"; const h=Math.floor(m/60); if(h<24) return "hace "+h+" h"; return new Date(ts).toLocaleDateString("es-ES",{day:"numeric",month:"short"});}
+function updLine(fk){const x=((areaObj(curArea())||{}).t||{})[fk]; if(!x||!x.ts) return ""; return `<small class="upd">${agoTxt(x.ts)}${x.n?" · "+esc(x.n):""}</small>`;}
+function visibleNames(list,isSet,keyOf){
+  if(admin) return list.slice();
+  const now=Date.now(), q=nrm(V.q||"").trim();
+  let out=list.filter(n=>!q||nrm(n).includes(q));
+  if(V.hide) out=out.filter(n=>!isSet(n)||now-(recent[keyOf(n)]||0)<10000);
+  if(V.alpha) out=out.slice().sort((a,b)=>a.localeCompare(b,"es",{sensitivity:"base"}));
+  return out;
+}
+function toolbar(v,placeholder){
+  if(admin) return;
+  const tb=el("div","toolbar");
+  const sw=el("div","search",`<input id="search" type="search" placeholder="${esc(placeholder)}" autocomplete="off" enterkeyhint="search">${V.q?'<button type="button" class="sx" aria-label="Borrar búsqueda">✕</button>':''}`);
+  const inp=sw.querySelector("input"); inp.value=V.q||"";
+  inp.oninput=()=>{V.q=inp.value; render();};
+  const sx=sw.querySelector(".sx"); if(sx) sx.onclick=()=>{V.q=""; render(); const f=$("search"); if(f) f.focus();};
+  const h=el("button","chip"+(V.hide?" on":""),"Ocultar contados"); h.type="button"; h.id="tb-hide"; h.onclick=()=>{V.hide=!V.hide; prefs(); render();};
+  const az=el("button","chip"+(V.alpha?" on":""),"A–Z"); az.type="button"; az.id="tb-az"; az.onclick=()=>{V.alpha=!V.alpha; prefs(); render();};
+  const vb=el("button","chip"+(V.vib?" on":""),V.vib?"📳 Vibración":"📴 Vibración"); vb.type="button"; vb.id="tb-vib";
+  vb.onclick=()=>{V.vib=!V.vib; try{localStorage.setItem("inv-vib",V.vib?"1":"0");}catch(e){} if(V.vib) setTimeout(()=>buzz(30)); render();};
+  const row=el("div","tchips"); row.append(h,az,vb);
+  tb.append(sw,row); v.appendChild(tb);
+}
+function emptyMsg(){return el("div","empty big",V.q?`No hay nada que se llame «${esc(V.q)}».`:"¡Todo contado! 🎉");}
+
+/* ---------- Tema y vibración ---------- */
+let THEME="auto"; V.vib=true;
+try{THEME=localStorage.getItem("inv-theme")||"auto"; V.vib=localStorage.getItem("inv-vib")!=="0";}catch(e){}
+function applyTheme(){
+  const r=document.documentElement;
+  if(THEME==="auto") r.removeAttribute("data-theme"); else r.setAttribute("data-theme",THEME);
+  const b=$("themeBtn"); if(b){b.textContent=THEME==="dark"?"🌙":THEME==="light"?"☀️":"◐"; b.title=THEME==="dark"?"Tema oscuro":THEME==="light"?"Tema claro":"Tema automático";}
+}
+function cycleTheme(){
+  THEME=THEME==="auto"?"light":THEME==="light"?"dark":"auto";
+  try{localStorage.setItem("inv-theme",THEME);}catch(e){}
+  applyTheme(); toast(THEME==="dark"?"Modo oscuro":THEME==="light"?"Modo claro":"Tema automático (el del móvil)");
+}
+let hapt=null;
+function buzz(ms){
+  if(!V.vib) return;
+  try{ if(navigator.vibrate&&navigator.vibrate(ms||12)) return; }catch(e){}
+  try{ // iPhone (iOS 18+): un interruptor nativo da un toque háptico
+    if(!hapt){hapt=document.createElement("label"); hapt.setAttribute("aria-hidden","true"); hapt.style.cssText="position:fixed;left:-200px;top:0;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none";
+      const i=document.createElement("input"); i.type="checkbox"; i.setAttribute("switch",""); i.tabIndex=-1; hapt.appendChild(i); document.body.appendChild(hapt);}
+    hapt.click();
+  }catch(e){}
+}
+document.addEventListener("click",e=>{
+  const t=e.target.closest&&e.target.closest(".step button,.chip,.tile,.addb,.primary,.sec,.tabs button,.clr,.rm");
+  if(t&&!t.disabled) buzz();
+},true);
+
+/* ---------- Quién está contando ahora ---------- */
+let devId="";
+try{devId=localStorage.getItem("inv-dev")||""; if(!devId){devId="d"+Math.random().toString(36).slice(2,10)+Date.now().toString(36); localStorage.setItem("inv-dev",devId);}}catch(e){devId="d"+Math.random().toString(36).slice(2,10);}
+let PRES=[], lastPres="";
+function presArea(){if(EDIT) return ""; return V.screen==="almacen"?"alm":V.screen==="barra"?(V.b===1?"b1":"b2"):"";}
+async function pushPres(force){
+  if(!DB) return;
+  const a=document.hidden?"":presArea(), sig=a+"|"+sendName;
+  if(!force&&sig===lastPres) return; lastPres=sig;
+  try{await DB.doc("presencia/"+devId).set({nombre:sendName||"",area:a,ts:Date.now()});}catch(e){}
+}
+function startPresence(db){
+  try{db.collection("presencia").onSnapshot(qs=>{PRES=qs.docs.map(d=>Object.assign({id:d.id},d.data())); if(V.screen!=="encargado") softRender();},()=>{});}catch(e){}
+  pushPres(true);
+  setInterval(()=>{if(presArea()&&!document.hidden) pushPres(true); else if(isCounting()) softRender();},60000);
+  document.addEventListener("visibilitychange",()=>pushPres());
+}
+function others(a){const now=Date.now(); return [...new Set(PRES.filter(p=>p.id!==devId&&p.area===a&&now-(p.ts||0)<3*60000).map(p=>p.nombre||"Alguien"))];}
+function whoTxt(a){const o=others(a); return o.length?"👤 "+o.join(", "):"";}
 
 /* ---------- Utilidades ---------- */
 const $=id=>document.getElementById(id);
@@ -594,10 +793,11 @@ function outName(name,n){
   if(/^barril /i.test(s)) s=(n>1?"barriles ":"barril ")+s.slice(7);
   return s;
 }
+function dayTxt(ts){const d=new Date(ts).toLocaleDateString("es-ES",{weekday:"long",day:"numeric",month:"long"}); return d.charAt(0).toUpperCase()+d.slice(1);}
 function today(){const d=new Date().toLocaleDateString("es-ES",{weekday:"long",day:"numeric",month:"long"}); return d.charAt(0).toUpperCase()+d.slice(1);}
 function el(tag,cls,html){const e=document.createElement(tag); if(cls) e.className=cls; if(html!=null) e.innerHTML=html; return e;}
 function moveIn(arr,i,d){const j=i+d; if(j<0||j>=arr.length) return; [arr[i],arr[j]]=[arr[j],arr[i]];}
-function commitAll(){save(); syncConf(); syncCounts(); render();}
+function commitAll(){trackChange(); save(); syncConf(); syncCounts(); render();}
 
 function stepper(v,step,id,label,onSet){
   const st=el("div","step");
@@ -670,18 +870,31 @@ function render(){
   document.body.style.paddingBottom=working?"120px":"24px";
   $("backBtn").hidden=V.screen==="home";
   $("backBtn").textContent=V.screen==="barra"?"‹ Barras":"‹ Inicio";
-  $("title").textContent={home:"Inventario",almacen:"Almacén",barras:"Barra",barra:"Barra "+V.b}[V.screen];
+  $("title").textContent={home:"Inventario",almacen:"Almacén",barras:"Barra",barra:"Barra "+V.b,encargado:"Encargado"}[V.screen];
   renderAdminBar();
-  ({home:renderHome,almacen:renderAlmacen,barras:renderBarras,barra:renderBarra})[V.screen](v);
-  if(focusId&&$(focusId)) $(focusId).focus({preventScroll:true});
+  editBanner(v);
+  ({home:renderHome,almacen:renderAlmacen,barras:renderBarras,barra:renderBarra,encargado:renderEncargado})[V.screen](v);
+  if(focusId&&$(focusId)){const f=$(focusId); f.focus({preventScroll:true}); if(focusId==="search"){try{f.setSelectionRange(f.value.length,f.value.length);}catch(e){}}}
+  $("undoBtn").hidden=!(working&&undo[curArea()]&&undo[curArea()].length);
+  const editingHere=!!(EDIT&&working&&curArea()===EDIT.k);
+  $("showBtn").textContent=editingHere?"Guardar corrección":"Enviar";
+  $("resetBtn").hidden=editingHere;
 }
-function go(screen,extra){Object.assign(V,{screen},extra||{}); $("confirmBox").hidden=true; render(); window.scrollTo(0,0);}
+function go(screen,extra){
+  if(V.screen==="encargado"&&screen!=="encargado") encOk=false;
+  const changedPlace=screen!==V.screen||(extra&&extra.b&&extra.b!==V.b);
+  Object.assign(V,{screen},extra||{}); if(changedPlace) V.q="";
+  $("confirmBox").hidden=true; render(); window.scrollTo(0,0);
+  if(isCounting()&&!sendName&&!admin) openWho();
+  pushPres();
+}
 function renderAdminBar(){
   const b=$("adminBar"); b.hidden=!admin; if(!admin) return;
   b.innerHTML=`<span>🔧 <b>Modo admin</b> · ${sync==="ok"?"los cambios se guardan para todos":sync==="error"?"⚠️ no se pudo guardar el último cambio":"⚠️ sin conexión: solo se guarda en este móvil"}</span>`;
-  const pw=el("button",null,"Contraseña"); pw.type="button"; pw.onclick=()=>openPw("change");
+  const pw=el("button",null,"Clave admin"); pw.type="button"; pw.onclick=()=>openPw("change");
+  const pe=el("button",null,"Clave encargado"); pe.type="button"; pe.onclick=()=>openPw("encChange");
   const out=el("button",null,"Salir"); out.type="button"; out.onclick=()=>{admin=false; render(); toast("Has salido del modo admin");};
-  b.append(pw,out);
+  b.append(pw,pe,out);
 }
 
 function countAlm(){return Object.keys(L.alm.q).length+(L.alm.friaMode?1:0);}
@@ -690,13 +903,14 @@ function tile(title,sub,main,fn){const t=el("button","tile"+(main?" main":""),`<
 function marked(n){return n?`${n} marcado${n===1?"":"s"}`:"Sin empezar";}
 function renderHome(v){
   const t=el("div","tiles");
-  t.append(tile("Almacén",C.cfg.alm.map(s=>s.title.toLowerCase()).join(", ")+" · "+marked(countAlm()),true,()=>go("almacen")),
-           tile("Barra","Botellas y neveras de las barras",false,()=>go("barras")));
+  t.append(tile("Almacén",C.cfg.alm.map(s=>s.title.toLowerCase()).join(", ")+" · "+marked(countAlm())+(whoTxt("alm")?"<br>"+esc(whoTxt("alm"))+" contando":""),true,()=>go("almacen")),
+           tile("Barra","Botellas y neveras de las barras"+((whoTxt("b1")||whoTxt("b2"))?"<br>"+[whoTxt("b1")&&esc(whoTxt("b1"))+" en B1",whoTxt("b2")&&esc(whoTxt("b2"))+" en B2"].filter(Boolean).join(" · "):""),false,()=>go("barras")),
+           tile("Encargado","🔒 Total de almacén y barras",false,openEncargado));
   v.appendChild(t);
 }
 function renderBarras(v){
   const t=el("div","tiles");
-  [1,2].forEach(b=>t.appendChild(tile("Barra "+b,marked(countBarra(b)),b===1,()=>go("barra",{b,tab:"botellas"}))));
+  [1,2].forEach(b=>t.appendChild(tile("Barra "+b,marked(countBarra(b))+(whoTxt("b"+b)?"<br>"+esc(whoTxt("b"+b))+" contando":""),b===1,()=>go("barra",{b,tab:"botellas"}))));
   v.appendChild(t);
 }
 
@@ -707,13 +921,22 @@ function setAq(g,n,v){if(v>0)A().q[g+"|"+n]=v; else delete A().q[g+"|"+n];}
 function allGroups(){const out=[]; C.cfg.alm.forEach(s=>s.groups.forEach(g=>out.push({g,s}))); return out;}
 function findGroup(id){return allGroups().find(x=>x.g.id===id);}
 
+function presBanner(v){const o=others(presArea()); if(o.length&&!admin) v.appendChild(el("div","pres","👥 También contando aquí: <b>"+o.map(esc).join(", ")+"</b>"));}
 function renderAlmacen(v){
+  presBanner(v);
+  toolbar(v,"Buscar en el almacén…");
+  const filt=!admin&&(V.q||V.hide); let shown=0;
   C.cfg.alm.forEach((sec,si)=>{
     let n=0; sec.groups.forEach(g=>C.almLists[g.id].forEach(it=>{if(aq(g.id,it)>0)n++}));
     if(sec.key==="fria"&&A().friaMode) n=1;
     const s=el("section");
     if(admin) s.appendChild(adminSectionHead(sec,si)); else s.innerHTML=shead(sec.title,sec.hint,n);
+    let vis=0;
     if(sec.key==="fria"){
+      const done=!!A().friaMode||aq("fria","Cajas")>0;
+      const rec=Date.now()-Math.max(recent.fria||0,recent["q:fria|Cajas"]||0)<10000;
+      if(!admin&&((V.q&&!nrm(sec.title+" cajas nevera cerveza").includes(nrm(V.q).trim()))||(V.hide&&done&&!rec))) return;
+      vis++;
       const ch=el("div","chips");
       for(const [m,l] of [["lleno","Llena"],["vacio","Vacía"]]){
         const b=el("button","chip"+(A().friaMode===m?" on":""),l); b.type="button";
@@ -723,26 +946,30 @@ function renderAlmacen(v){
       s.appendChild(ch);
     }
     sec.groups.forEach((g,gi)=>{
-      const fixed=g.id==="fria";
-      if(admin&&!fixed) s.appendChild(adminGroupHead(sec,g,gi));
-      else if(g.title) s.appendChild(el("div","sub",esc(g.title)));
-      const list=C.almLists[g.id];
-      list.forEach((name,i)=>{
-        if(admin&&!fixed) return s.appendChild(adminItem({name,i,list,id:"ed-"+g.id+"-"+i,
+      const fixed=g.id==="fria", list=C.almLists[g.id];
+      if(admin&&!fixed){
+        s.appendChild(adminGroupHead(sec,g,gi));
+        list.forEach((name,i)=>s.appendChild(adminItem({name,i,list,id:"ed-"+g.id+"-"+i,
           onRename:(o,nw)=>renameAlm(g,o,nw), onDelete:()=>deleteAlm(g,i),
           targets:allGroups().filter(x=>x.g.id!==g.id&&x.g.id!=="fria").map(x=>({id:x.g.id,label:x.g.title||x.s.title})),
-          onMove:to=>moveAlm(g,i,to)}));
-        s.appendChild(g.kind==="level"?levelRow(g,name):countRow(g,name));
-      });
-      if(admin&&!fixed) s.appendChild(addBox("add-"+g.id,"Añadir a "+(g.title||sec.title).toLowerCase()+"…",val=>{
-        if(list.some(x=>x.toLowerCase()===val.toLowerCase())) return false; list.push(val);
-      }));
+          onMove:to=>moveAlm(g,i,to)})));
+        s.appendChild(addBox("add-"+g.id,"Añadir a "+(g.title||sec.title).toLowerCase()+"…",val=>{
+          if(list.some(x=>x.toLowerCase()===val.toLowerCase())) return false; list.push(val);
+        }));
+        return;
+      }
+      const names=fixed?list:visibleNames(list,nm=>aq(g.id,nm)>0,nm=>"q:"+g.id+"|"+nm);
+      if(!names.length) return;
+      if(g.title) s.appendChild(el("div","sub",esc(g.title)));
+      names.forEach(name=>{vis++; s.appendChild(g.kind==="level"?levelRow(g,name):countRow(g,name));});
     });
     if(admin&&sec.key!=="fria") s.appendChild(newGroupBox(sec));
-    v.appendChild(s);
+    if(filt&&!vis) return;
+    shown+=vis; v.appendChild(s);
   });
+  if(filt&&!shown) v.appendChild(emptyMsg());
   if(admin) v.appendChild(newSectionBox());
-  v.appendChild(notesSection(A()));
+  if(!V.q) v.appendChild(notesSection(A()));
 }
 function renameAlm(g,o,nw){
   const list=C.almLists[g.id]; list[list.indexOf(o)]=nw;
@@ -794,18 +1021,18 @@ function newSectionBox(){
   const w=el("section","adm-wrap"); w.appendChild(el("div","sub","Añadir sección")); w.appendChild(box); return w;
 }
 function countRow(g,name){
-  const val=aq(g.id,name), r=el("div","row"+(val>0?" set":""),`<div class="name">${esc(name)}</div>`);
+  const val=aq(g.id,name), r=el("div","row"+(val>0?" set":""),`<div class="name">${esc(name)}${updLine("q:"+g.id+"|"+name)}</div>`);
   r.appendChild(stepper(val,g.step||1,"q-"+g.id+"-"+idOf(name),name,n=>{setAq(g.id,name,n); if(g.id==="fria"&&n) A().friaMode=""; commitAll();}));
   return r;
 }
 function levelRow(g,name){
   const val=aq(g.id,name), r=el("div","lvl"+(val>0?" set":""));
-  r.innerHTML=`<div class="top"><div class="name">${esc(name)}</div><div><span class="val">${val?val+" · "+LEVELS[val]:"sin marcar"}</span>${val?' <button type="button" class="clr">quitar</button>':''}</div></div>`;
+  r.innerHTML=`<div class="top"><div class="name">${esc(name)}${updLine("q:"+g.id+"|"+name)}</div><div><span class="val">${val?val+" · "+LEVELS[val]:"sin marcar"}</span>${val?' <button type="button" class="clr">quitar</button>':''}</div></div>`;
   const rg=document.createElement("input"); rg.type="range"; rg.min=1; rg.max=5; rg.step=1; rg.value=val||3;
   rg.id="lvl-"+g.id+"-"+idOf(name); rg.setAttribute("aria-label",name+", del 1 (nada) al 5 (casi llena)");
   const lab=r.querySelector(".val");
   rg.oninput=()=>{const n=+rg.value; lab.textContent=n+" · "+LEVELS[n]; r.classList.add("set");};
-  rg.onchange=()=>{setAq(g.id,name,+rg.value); commitAll();};
+  rg.onchange=()=>{buzz(); setAq(g.id,name,+rg.value); commitAll();};
   rg.addEventListener("pointerup",()=>{if(!aq(g.id,name)){setAq(g.id,name,+rg.value); commitAll();}});
   const clr=r.querySelector(".clr"); if(clr) clr.onclick=()=>{setAq(g.id,name,0); commitAll();};
   r.append(rg,el("div","ticks","<span>1 nada</span><span>2</span><span>3</span><span>4</span><span>5 llena</span>"));
@@ -861,29 +1088,41 @@ function notesLines(st){
 /* ---------- Barra ---------- */
 const B=()=>L.barras[V.b];
 function renderBarra(v){
+  presBanner(v);
   const tabs=el("div","tabs");
   [["botellas","Botellas"],["neveras","Neveras"]].forEach(([k,l])=>{
     const n=k==="botellas"?Object.keys(B().alc).length:Object.keys(B().nev).length;
     const b=el("button",V.tab===k?"on":"",l+(n?` · ${n}`:"")); b.type="button"; b.id="tab-"+k;
-    b.onclick=()=>{V.tab=k; render();};
+    b.onclick=()=>{V.tab=k; V.q=""; render();};
     tabs.appendChild(b);
   });
   v.appendChild(tabs);
   if(V.tab==="botellas") renderBotellas(v); else renderNeveras(v);
-  v.appendChild(notesSection(B()));
+  if(!V.q) v.appendChild(notesSection(B()));
 }
 function renderBotellas(v){
   const cats=C.cfg.cats;
   if(!cats.find(c=>c.id===V.cat)) V.cat=cats[0]?cats[0].id:"";
+  toolbar(v,"Buscar botella en todas las categorías…");
   const row=el("div","cats");
   cats.forEach(c=>{
     const n=C.alcLists[c.id].filter(x=>B().alc[x]).length;
-    const b=el("button","chip"+(V.cat===c.id?" on":""),`${esc(c.title)}${n?`<i>${n}</i>`:""}`); b.type="button"; b.id="cat-"+c.id;
-    b.onclick=()=>{V.cat=c.id; render();};
+    const b=el("button","chip"+(V.cat===c.id&&!(V.q&&!admin)?" on":""),`${esc(c.title)}${n?`<i>${n}</i>`:""}`); b.type="button"; b.id="cat-"+c.id;
+    b.onclick=()=>{V.cat=c.id; V.q=""; render();};
     row.appendChild(b);
   });
   v.appendChild(row);
   if(admin) v.appendChild(newCatBox());
+  if(!admin&&V.q){
+    let shown=0;
+    cats.forEach(cat=>{
+      const names=visibleNames(C.alcLists[cat.id],n=>!!B().alc[n],n=>"alc:"+n); if(!names.length) return;
+      const s=el("section",null,shead(cat.title,"",names.filter(x=>B().alc[x]).length));
+      names.forEach(n=>s.appendChild(bottleCard(cat,n))); v.appendChild(s); shown+=names.length;
+    });
+    if(!shown) v.appendChild(emptyMsg());
+    return;
+  }
   const cat=cats.find(c=>c.id===V.cat); if(!cat) return;
   const ci=cats.indexOf(cat), list=C.alcLists[cat.id];
   const s=el("section");
@@ -896,17 +1135,20 @@ function renderBotellas(v){
     lab.querySelector("input").onchange=e=>{cat.clear=e.target.checked; commitAll();};
     h.appendChild(lab);
     s.appendChild(h);
-  } else s.innerHTML=shead(cat.title,"Arrastra la botella para marcar cuánto queda",list.filter(x=>B().alc[x]).length);
-  if(!list.length) s.appendChild(el("div","empty",admin?"Esta categoría está vacía. Añade botellas abajo.":"No hay botellas en esta categoría."));
-  list.forEach((name,i)=>{
-    if(admin) s.appendChild(adminItem({name,i,list,id:"ea-"+cat.id+"-"+i,
+    if(!list.length) s.appendChild(el("div","empty","Esta categoría está vacía. Añade botellas abajo."));
+    list.forEach((name,i)=>s.appendChild(adminItem({name,i,list,id:"ea-"+cat.id+"-"+i,
       onRename:(o,nw)=>{list[i]=nw; [1,2].forEach(b=>{const a=L.barras[b].alc; if(a[o]){a[nw]=a[o]; delete a[o];}});},
       onDelete:()=>{list.splice(i,1); [1,2].forEach(b=>delete L.barras[b].alc[name]);},
       targets:cats.filter(c=>c.id!==cat.id).map(c=>({id:c.id,label:c.title})),
-      onMove:to=>{const tl=C.alcLists[to]; if(tl.includes(name)){toast("Ya está en esa categoría"); return;} list.splice(i,1); tl.push(name); toast("Movida a "+cats.find(c=>c.id===to).title);}}));
-    else s.appendChild(bottleCard(cat,name));
-  });
-  if(admin) s.appendChild(addBox("add-alc","Añadir botella a "+cat.title.toLowerCase()+"…",val=>{if(list.some(x=>x.toLowerCase()===val.toLowerCase())) return false; list.push(val);}));
+      onMove:to=>{const tl=C.alcLists[to]; if(tl.includes(name)){toast("Ya está en esa categoría"); return;} list.splice(i,1); tl.push(name); toast("Movida a "+cats.find(c=>c.id===to).title);}})));
+    s.appendChild(addBox("add-alc","Añadir botella a "+cat.title.toLowerCase()+"…",val=>{if(list.some(x=>x.toLowerCase()===val.toLowerCase())) return false; list.push(val);}));
+    v.appendChild(s); return;
+  }
+  s.innerHTML=shead(cat.title,"Arrastra la botella para marcar cuánto queda",list.filter(x=>B().alc[x]).length);
+  const names=visibleNames(list,n=>!!B().alc[n],n=>"alc:"+n);
+  if(!list.length) s.appendChild(el("div","empty","No hay botellas en esta categoría."));
+  else if(!names.length) s.appendChild(el("div","empty","¡Todo contado en "+esc(cat.title.toLowerCase())+"! 🎉"));
+  names.forEach(name=>s.appendChild(bottleCard(cat,name)));
   v.appendChild(s);
 }
 function newCatBox(){
@@ -918,8 +1160,10 @@ function newCatBox(){
 }
 function renderNeveras(v){
   const groups=C.cfg.nev;
+  toolbar(v,"Buscar en las neveras…");
   const s=el("section",null,shead("Neveras","Lo que queda en las neveras de esta barra",Object.keys(B().nev).length));
   if(!groups.length) s.appendChild(el("div","empty",admin?"No hay grupos. Crea uno abajo.":"Todavía no hay productos para las neveras."));
+  let shown=0;
   groups.forEach((g,gi)=>{
     const list=C.nevLists[g.id];
     if(admin){
@@ -928,19 +1172,24 @@ function renderNeveras(v){
       h.append(ib("↑","Subir grupo",()=>moveIn(groups,gi,-1),gi===0), ib("↓","Bajar grupo",()=>moveIn(groups,gi,1),gi===groups.length-1));
       h.appendChild(armBtn("Borrar grupo "+g.title,()=>{delete C.nevLists[g.id]; groups.splice(gi,1);}));
       s.appendChild(h);
-    } else if(g.title) s.appendChild(el("div","sub",esc(g.title)));
-    list.forEach((name,i)=>{
-      if(admin) return s.appendChild(adminItem({name,i,list,id:"en-"+g.id+"-"+i,
+      list.forEach((name,i)=>s.appendChild(adminItem({name,i,list,id:"en-"+g.id+"-"+i,
         onRename:(o,nw)=>{list[i]=nw; [1,2].forEach(b=>{const nv=L.barras[b].nev; if(nv[o]!=null){nv[nw]=nv[o]; delete nv[o];}});},
         onDelete:()=>{list.splice(i,1); [1,2].forEach(b=>delete L.barras[b].nev[name]);},
         targets:groups.filter(x=>x.id!==g.id).map(x=>({id:x.id,label:x.title||"Sin título"})),
-        onMove:to=>{const tl=C.nevLists[to]; if(tl.includes(name)){toast("Ya está en ese grupo"); return;} list.splice(i,1); tl.push(name); toast("Movido");}}));
-      const val=B().nev[name]||0, r=el("div","row"+(val>0?" set":""),`<div class="name">${esc(name)}</div>`);
+        onMove:to=>{const tl=C.nevLists[to]; if(tl.includes(name)){toast("Ya está en ese grupo"); return;} list.splice(i,1); tl.push(name); toast("Movido");}})));
+      s.appendChild(addBox("add-nv-"+g.id,"Añadir a "+(g.title||"este grupo").toLowerCase()+"…",val=>{if(list.some(x=>x.toLowerCase()===val.toLowerCase())) return false; list.push(val);}));
+      return;
+    }
+    const names=visibleNames(list,n=>B().nev[n]>0,n=>"nev:"+n);
+    if(!names.length) return;
+    if(g.title) s.appendChild(el("div","sub",esc(g.title)));
+    names.forEach(name=>{shown++;
+      const val=B().nev[name]||0, r=el("div","row"+(val>0?" set":""),`<div class="name">${esc(name)}${updLine("nev:"+name)}</div>`);
       r.appendChild(stepper(val,1,"nev-"+g.id+"-"+idOf(name),name,x=>{if(x>0)B().nev[name]=x; else delete B().nev[name]; commitAll();}));
       s.appendChild(r);
     });
-    if(admin) s.appendChild(addBox("add-nv-"+g.id,"Añadir a "+(g.title||"este grupo").toLowerCase()+"…",val=>{if(list.some(x=>x.toLowerCase()===val.toLowerCase())) return false; list.push(val);}));
   });
+  if(!admin&&groups.length&&!shown) s.appendChild(emptyMsg());
   if(admin){
     const box=addBox("new-nvg","Nuevo grupo de neveras…",val=>{const id=newId("nv"); groups.push({id,title:val}); C.nevLists[id]=[];});
     box.classList.add("adm-new"); s.appendChild(box);
@@ -974,12 +1223,12 @@ function summary(r){
 function bottleCard(cat,name){
   const r=B().alc[name], ps=r&&r.ps.length?r.ps:[null], f=r?r.f||0:0;
   const card=el("div","bot"+(r?" set":""));
-  card.innerHTML=`<div class="btop"><div class="name">${esc(name)}</div><div class="sum">${esc(summary(r))}${r?' · <button type="button" class="clr">quitar</button>':''}</div></div><div class="bots"></div><div class="full"><label for="full-${idOf(name)}">Llenas</label></div>`;
+  card.innerHTML=`<div class="btop"><div class="name">${esc(name)}${updLine("alc:"+name)}</div><div class="sum">${esc(summary(r))}${r?' · <button type="button" class="clr">quitar</button>':''}</div></div><div class="bots"></div><div class="full"><label for="full-${idOf(name)}">Llenas</label></div>`;
   const bots=card.querySelector(".bots");
   ps.forEach((p,i)=>{
     const u=el("div","bu",bottleSvg(cat,name,i,p)+`<b>${p==null?"—":p+"%"}</b>`+(ps.length>1?`<button type="button" class="rm">quitar</button>`:""));
     const svg=u.querySelector("svg"), liq=svg.querySelector(".liq"), lab=u.querySelector("b");
-    const commit=val=>{const x=rec(name); x.ps[i]=val; commitAll();};
+    const commit=val=>{buzz(); const x=rec(name); x.ps[i]=val; commitAll();};
     const show=val=>{const yy=liqY(val); liq.setAttribute("y",yy); liq.setAttribute("height",150-yy); lab.textContent=val+"%"; card.classList.add("set");};
     const fromEvent=e=>{const rc=svg.getBoundingClientRect(); const yy=(e.clientY-rc.top)/rc.height*150; return Math.max(0,Math.min(100,Math.round((BOT-yy)/(BOT-TOP)*100/5)*5));};
     let cur=p, drag=false;
@@ -1002,30 +1251,332 @@ function bottleCard(cat,name){
   const clr=card.querySelector(".clr"); if(clr) clr.onclick=()=>{delete B().alc[name]; commitAll();};
   return card;
 }
-function msgBarra(){
-  const body=[];
+function msgBarra(b){
+  const X=L.barras[b], body=[];
   for(const c of C.cfg.cats){
-    const lines=C.alcLists[c.id].filter(n=>B().alc[n]).map(n=>`• ${n}: ${summary(B().alc[n])}`);
+    const lines=C.alcLists[c.id].filter(n=>X.alc[n]).map(n=>`• ${n}: ${summary(X.alc[n])}`);
     if(lines.length) body.push(`${c.icon||"🍾"} *${c.title.toUpperCase()}*\n`+lines.join("\n"));
   }
-  const nevItems=[]; C.cfg.nev.forEach(g=>C.nevLists[g.id].forEach(n=>{if(B().nev[n]>0&&!nevItems.includes(n)) nevItems.push(n);}));
-  if(nevItems.length) body.push("🧊 *NEVERAS*\n"+nevItems.map(n=>`• ${B().nev[n]} ${n}`).join("\n"));
-  const nl=notesLines(B()); if(nl) body.push(nl);
-  return {title:"INVENTARIO BARRA "+V.b, body};
+  const nevItems=[]; C.cfg.nev.forEach(g=>C.nevLists[g.id].forEach(n=>{if(X.nev[n]>0&&!nevItems.includes(n)) nevItems.push(n);}));
+  if(nevItems.length) body.push("🧊 *NEVERAS*\n"+nevItems.map(n=>`• ${X.nev[n]} ${n}`).join("\n"));
+  const nl=notesLines(X); if(nl) body.push(nl);
+  return {title:"INVENTARIO BARRA "+b, body};
 }
 
 /* ---------- Mensaje ---------- */
-function buildMessage(){
-  const m=V.screen==="barra"?msgBarra():msgAlmacen();
+const AREA_NAME={alm:"Almacén",b1:"Barra 1",b2:"Barra 2"};
+function buildMessage(area,nombre,ts){
+  area=area||curArea();
+  const m=area==="alm"?msgAlmacen():msgBarra(area==="b1"?1:2);
   if(!m.body.length) return "(todavía no has marcado nada)";
-  return [`📋 *${m.title}*\n_${today()}_`,...m.body].join("\n\n");
+  return [`📋 *${m.title}*\n_${ts?dayTxt(ts):today()}_`+(nombre?`\n👤 Enviado por ${nombre}`:""),...m.body].join("\n\n");
 }
 function toast(t){const e=$("toast"); e.textContent=t; e.hidden=false; clearTimeout(toast.t); toast.t=setTimeout(()=>e.hidden=true,1800);}
-function openSheet(){const m=buildMessage(); $("msg").textContent=m; $("wa").href="https://wa.me/?text="+encodeURIComponent(m); $("sheet").hidden=false;}
+let msgText="";
+function openSheet(text){msgText=text||buildMessage(); $("msg").textContent=msgText; $("wa").href="https://wa.me/?text="+encodeURIComponent(msgText); $("sheet").hidden=false;}
 function copy(){
-  const m=buildMessage();
-  const sel=()=>{openSheet(); const r=document.createRange(); r.selectNodeContents($("msg")); const s=getSelection(); s.removeAllRanges(); s.addRange(r); toast("Texto seleccionado, cópialo");};
+  const m=msgText||buildMessage();
+  const sel=()=>{if($("sheet").hidden) openSheet(m); const r=document.createRange(); r.selectNodeContents($("msg")); const s=getSelection(); s.removeAllRanges(); s.addRange(r); toast("Texto seleccionado, cópialo");};
   try{navigator.clipboard.writeText(m).then(()=>toast("Copiado"),sel);}catch(e){sel();}
+}
+
+/* ---------- Enviar: quién lo envía, registrar o WhatsApp ---------- */
+let sendName="";
+try{sendName=localStorage.getItem("inv-nombre")||"";}catch(e){}
+function chosenName(){return ($("otherName").value.trim()||sendName).trim();}
+function renderPeople(){
+  const box=$("peopleChips"); box.innerHTML="";
+  C.people.forEach((p,i)=>{
+    const on=!$("otherName").value.trim()&&p===sendName;
+    const b=el("button","chip"+(on?" on":""),esc(p)+(admin?'<span class="x">✕</span>':'')); b.type="button";
+    b.onclick=()=>{
+      if(admin){C.people.splice(i,1); syncConf(); renderPeople(); return;}
+      sendName=p; $("otherName").value=""; renderPeople();
+    };
+    box.appendChild(b);
+  });
+  const pa=$("peopleAdmin"); pa.innerHTML="";
+  if(admin) pa.appendChild(addBox("add-person","Añadir nombre rápido…",v=>{if(C.people.some(x=>x.toLowerCase()===v.toLowerCase())) return false; C.people.push(v); syncConf(); setTimeout(renderPeople);}));
+}
+function missingGroups(area){
+  const out=[];
+  if(area==="alm"){
+    C.cfg.alm.forEach(sec=>{
+      if(sec.key==="fria"){ if(!L.alm.friaMode&&!(aq("fria","Cajas")>0)) out.push(sec.title); return; }
+      sec.groups.forEach(g=>{const l=C.almLists[g.id]||[]; if(l.length&&!l.some(n=>aq(g.id,n)>0)) out.push(g.title||sec.title);});
+    });
+  } else {
+    const X=L.barras[area==="b1"?1:2];
+    C.cfg.cats.forEach(c=>{const l=C.alcLists[c.id]; if(l.length&&!l.some(n=>X.alc[n])) out.push(c.title);});
+    if(C.cfg.nev.length&&!Object.keys(X.nev).length) out.push("Neveras");
+  }
+  return out;
+}
+function setSendMode(who){
+  $("whoBtn").hidden=!who; $("sendActs").hidden=who; $("sendCancel").hidden=who;
+}
+function openSend(){
+  const area=curArea();
+  $("sendTitle").textContent="Enviar "+AREA_NAME[area].toLowerCase()+": ¿quién lo envía?";
+  const miss=missingGroups(area), w=$("sendWarn");
+  w.hidden=!miss.length;
+  if(miss.length) w.innerHTML="<span>⚠️ <b>Sin contar:</b> "+miss.map(esc).join(", ")+". ¿Seguro que está todo?</span>";
+  if(!C.people.includes(sendName)&&!sendName) sendName=C.people[0]||"";
+  setSendMode(false);
+  const rr=recentReg(area);
+  $("updBtn").hidden=!rr;
+  if(rr) $("updBtn").textContent="Actualizar mi registro de las "+hhmm(rr.ts);
+  $("regBtn").textContent=rr?"Registrar como nuevo":"Registrar";
+  $("regBtn").className=rr?"sec":"primary";
+  $("otherName").value=C.people.includes(sendName)?"":sendName; renderPeople(); $("sendSheet").hidden=false;
+}
+function openWho(){
+  $("sendTitle").textContent="¿Quién eres?";
+  $("sendWarn").hidden=true; setSendMode(true);
+  $("otherName").value=""; renderPeople(); $("sendSheet").hidden=false;
+}
+function needName(){
+  const n=chosenName();
+  if(!n){toast("Elige o escribe un nombre"); $("otherName").focus(); return null;}
+  try{localStorage.setItem("inv-nombre",n);}catch(e){}
+  sendName=n; pushPres();
+  return n;
+}
+async function registrar(){
+  const n=needName(); if(!n) return;
+  const area=curArea(), text=buildMessage(area,n);
+  if(text.startsWith("(")){toast("No hay nada marcado para registrar"); return;}
+  if(!DB){toast("Sin conexión: no se puede registrar ahora"); return;}
+  $("regBtn").disabled=true;
+  try{
+    await DB.collection("registros").add({area, nombre:n, dev:devId, ts:Date.now(), msg:text, data:clone(areaObj(area))});
+    $("sendSheet").hidden=true; toast("Registrado ✓ El encargado ya lo puede ver");
+  }catch(e){ toast("No se ha podido registrar. Revisa la conexión o los permisos."); }
+  $("regBtn").disabled=false;
+}
+function recentReg(area){
+  const now=Date.now();
+  return REG.find(r=>r.area===area&&r.data&&(r.dev===devId||(sendName&&r.nombre===sendName))&&now-r.ts<12*3600000)||null;
+}
+function hhmm(ts){return new Date(ts).toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit"});}
+function regDoc(r,patch){const o=Object.assign({},r,patch); delete o.id; return o;}
+async function saveReg(r,area,n,verb){
+  const data=clone(areaObj(area));
+  const msg=buildMessage(area,r.nombre,r.ts)+`\n\n✏️ ${verb} por ${n} · ${fmtTs(Date.now())}`;
+  await DB.collection("registros").doc(r.id).set(regDoc(r,{data,msg,editadoPor:n,editadoTs:Date.now(),ediciones:(r.ediciones||0)+1}));
+}
+async function actualizarReg(){
+  const n=needName(); if(!n) return;
+  const area=curArea(), r=recentReg(area);
+  if(!r){registrar(); return;}
+  if(!DB){toast("Sin conexión: no se puede guardar ahora"); return;}
+  $("updBtn").disabled=true;
+  try{ await saveReg(r,area,n,"Actualizado"); $("sendSheet").hidden=true; toast("Registro actualizado ✓"); }
+  catch(e){ toast("No se ha podido actualizar. Revisa la conexión."); }
+  $("updBtn").disabled=false;
+}
+
+/* ---------- Corregir un registro ya enviado (desde Encargado) ---------- */
+function startEdit(r){
+  if(EDIT) endEdit();
+  const k=r.area, c=cnt[k];
+  EDIT={r, k, backup:clone(areaObj(k))};
+  c.paused=true; undo[k]=[];
+  setArea(k,normArea(k,r.data)); prevArea[k]=clone(areaObj(k));
+  pushPres(true);
+  if(k==="alm") go("almacen"); else go("barra",{b:k==="b1"?1:2,tab:"botellas"});
+  toast("Corrige lo que haga falta y pulsa Guardar corrección");
+}
+function endEdit(){
+  if(!EDIT) return;
+  const {k,backup}=EDIT, c=cnt[k];
+  setArea(k,backup); c.base=clone(backup); prevArea[k]=clone(backup); c.paused=false; c.full=false; undo[k]=[];
+  EDIT=null; save();
+}
+function cancelEdit(){const id=EDIT&&EDIT.r.id; endEdit(); V.openReg=id; go("encargado",{etab:"registros"}); toast("Corrección cancelada");}
+async function saveEdit(){
+  if(!EDIT) return;
+  if(!sendName){openWho(); return;}
+  if(!DB){toast("Sin conexión: no se puede guardar ahora"); return;}
+  const {r,k}=EDIT;
+  try{ await saveReg(r,k,sendName,"Corregido"); }
+  catch(e){ toast("No se ha podido guardar la corrección"); return; }
+  endEdit(); V.openReg=r.id; go("encargado",{etab:"registros"}); toast("Corrección guardada ✓");
+}
+function editBanner(v){
+  if(!EDIT) return;
+  const here=isCounting()&&curArea()===EDIT.k;
+  const b=el("div","editbar",`<span>✏️ ${here?"Corrigiendo":"Tienes a medias la corrección de"} <b>${esc(AREA_NAME[EDIT.k])}</b> del ${esc(fmtTs(EDIT.r.ts))} · ${esc(EDIT.r.nombre||"—")}${here?"<br><small>Los cambios no se ven en el inventario en común hasta que guardes.</small>":""}</span>`);
+  const ok=el("button","primary",here?"Guardar":"Seguir"); ok.type="button";
+  ok.onclick=here?saveEdit:()=>{if(EDIT.k==="alm") go("almacen"); else go("barra",{b:EDIT.k==="b1"?1:2,tab:"botellas"});};
+  const no=el("button","sec","Cancelar"); no.type="button"; no.onclick=cancelEdit;
+  const w=el("div","editacts"); w.append(ok,no); b.appendChild(w); v.appendChild(b);
+}
+
+function toWhatsApp(){
+  const n=needName(); if(!n) return;
+  $("sendSheet").hidden=true; openSheet(buildMessage(curArea(),n));
+}
+function startRegistros(db){
+  try{
+    db.collection("registros").orderBy("ts","desc").limit(60).onSnapshot(qs=>{
+      REG=qs.docs.map(d=>Object.assign({id:d.id},d.data())); regReady=true;
+      if(V.screen==="encargado"||V.screen==="home") render();
+    },()=>{regReady=false;});
+  }catch(e){}
+}
+
+/* ---------- Encargado: total de almacén y barras ---------- */
+function row2(name,val,cls,delta){return el("div","trow2"+(cls?" "+cls:""),`<span class="name">${esc(name)}</span><span class="vals">${delta||""}<span class="tt">${val}</span></span>`);}
+function dBadge(cur,prev,fmt){
+  if(prev==null) return "";
+  const d=Math.round((cur-prev)*10)/10;
+  if(d===0) return `<em class="dl eq" title="Igual que el anterior">=</em>`;
+  const f=fmt||(x=>half(x));
+  return `<em class="dl ${d<0?"dn":"up"}" title="Antes: ${f(prev)}">antes ${f(prev)} · <b>${d<0?"−":"+"}${f(Math.abs(d))}</b></em>`;
+}
+function almTable(X,P){
+  const box=el("div"); let n=0;
+  const q=(Y,g,k)=>Y&&Y.q?(Y.q[g+"|"+k]||0):0;
+  for(const sec of C.cfg.alm){
+    if(sec.key==="fria"){
+      const fv=Y=>!Y?null:Y.friaMode==="lleno"?"✅ Llena":Y.friaMode==="vacio"?"⚠️ Vacía":q(Y,"fria","Cajas")>0?half(q(Y,"fria","Cajas"))+" "+(q(Y,"fria","Cajas")===1?"caja":"cajas"):null;
+      const v=fv(X), pv=P?fv(P):null;
+      if(v||pv){n++; box.appendChild(el("div","sub",esc(sec.title)));
+        box.appendChild(row2("Nevera de cerveza",v||"—","wide",P&&pv!==v?`<em class="dl">antes: ${pv||"—"}</em>`:""));}
+      continue;
+    }
+    for(const g of sec.groups){
+      const items=(C.almLists[g.id]||[]).filter(k=>q(X,g.id,k)>0||q(P,g.id,k)>0); if(!items.length) continue;
+      box.appendChild(el("div","sub",esc(g.title?sec.title+" · "+g.title:sec.title)));
+      items.forEach(k=>{n++; const v=q(X,g.id,k), pv=P?q(P,g.id,k):null;
+        if(g.kind==="level") box.appendChild(row2(k,v?LEVEL_DOT[v]+" "+LEVELS[v]:"—","wide"+(v&&v<=2?" low":""),P&&pv!==v?`<em class="dl">antes: ${pv?LEVELS[pv]:"—"}</em>`:""));
+        else box.appendChild(row2(outName(k,v),half(v),v===0?"low":"",P?dBadge(v,pv):""));});
+    }
+  }
+  return {box,n};
+}
+function barraTable(X,P){
+  const box=el("div"); let n=0;
+  const A_=(Y,k)=>Y&&Y.alc?Y.alc[k]:null;
+  for(const c of C.cfg.cats){
+    const names=C.alcLists[c.id].filter(k=>A_(X,k)||A_(P,k)); if(!names.length) continue;
+    box.appendChild(el("div","sub",esc(c.title)));
+    names.forEach(k=>{n++; const r=A_(X,k), eq=bottleEq(r);
+      box.appendChild(row2(k,r?esc(summary(r)):"—","wide"+(eq===0?" low":""),P?dBadge(eq,bottleEq(A_(P,k)),fmtEq):""));});
+  }
+  const nv=(Y,k)=>Y&&Y.nev?(Y.nev[k]||0):0;
+  const nev=[]; C.cfg.nev.forEach(g=>C.nevLists[g.id].forEach(k=>{if((nv(X,k)>0||nv(P,k)>0)&&!nev.includes(k)) nev.push(k);}));
+  if(nev.length){box.appendChild(el("div","sub","Neveras")); nev.forEach(k=>{n++; box.appendChild(row2(k,nv(X,k),nv(X,k)===0?"low":"",P?dBadge(nv(X,k),nv(P,k),String):""));});}
+  return {box,n};
+}
+function notesBox(X){
+  const l=[...(X.notes||[])]; if((X.noteText||"").trim()) l.push(X.noteText.trim());
+  if(!l.length) return null;
+  const b=el("div"); b.appendChild(el("div","sub","Notas")); b.appendChild(el("div","notes-ro",l.map(z=>`<p>• ${esc(z)}</p>`).join(""))); return b;
+}
+
+function fmtEq(x){return (Math.round(x*10)/10).toString().replace(".",",");}
+function bottleCell(r){
+  if(!r) return "—";
+  const open=r.ps.filter(p=>p>0), f=r.f||0;
+  if(!f&&!open.length) return "0";
+  return (f?`<b>${f}</b>`:"")+(open.length?`<small>${f?" + ":""}${open.map(p=>p+"%").join(" ")}</small>`:"");
+}
+function bottleEq(r){return r?(r.f||0)+r.ps.filter(p=>p>0).reduce((a,p)=>a+p/100,0):0;}
+function totHead(){return el("div","trow thead",`<span>Producto</span><span>B1</span><span>B2</span><span>Total</span>`);}
+function renderEncargado(v){
+  const tabs=el("div","tabs");
+  [["total","Total ahora"],["registros","Registros"+(REG.length?` · ${REG.length}`:"")]].forEach(([k,l])=>{
+    const b=el("button",V.etab===k?"on":"",l); b.type="button"; b.id="etab-"+k;
+    b.onclick=()=>{V.etab=k; render();};
+    tabs.appendChild(b);
+  });
+  v.appendChild(tabs);
+  if(V.etab==="registros") return renderRegistros(v);
+  let any=false;
+  // Almacén
+  const at=almTable(L.alm);
+  const sa=el("section",null,shead("Almacén","Lo contado ahora mismo",at.n));
+  if(at.n){any=true; sa.appendChild(at.box);}
+  else sa.appendChild(el("div","empty","Todavía no se ha contado nada en el almacén."));
+  v.appendChild(sa);
+  // Botellas
+  const B1=L.barras[1], B2=L.barras[2];
+  const sb=el("section");
+  let nb=0; const body=el("div");
+  for(const c of C.cfg.cats){
+    const names=C.alcLists[c.id].filter(n=>B1.alc[n]||B2.alc[n]); if(!names.length) continue;
+    body.appendChild(el("div","sub",esc(c.title)));
+    body.appendChild(totHead());
+    names.forEach(n=>{nb++;
+      const eq=bottleEq(B1.alc[n])+bottleEq(B2.alc[n]);
+      body.appendChild(el("div","trow"+(eq===0?" zero":""),`<span class="name">${esc(n)}</span><span>${bottleCell(B1.alc[n])}</span><span>${bottleCell(B2.alc[n])}</span><span class="tt">${eq===0?"❌ 0":"≈ "+fmtEq(eq)}</span>`));
+    });
+  }
+  sb.innerHTML=shead("Botellas","Llenas + abiertas · total en botellas aprox.",nb);
+  if(nb){any=true; sb.appendChild(body);} else sb.appendChild(el("div","empty","Todavía no se han contado botellas."));
+  v.appendChild(sb);
+  // Neveras
+  const sn=el("section"); const nbody=el("div"); let nn=0;
+  C.cfg.nev.forEach(g=>{
+    const names=C.nevLists[g.id].filter(n=>B1.nev[n]>0||B2.nev[n]>0); if(!names.length) return;
+    if(g.title) nbody.appendChild(el("div","sub",esc(g.title)));
+    nbody.appendChild(totHead());
+    names.forEach(n=>{nn++; const a=B1.nev[n]||0, b=B2.nev[n]||0;
+      nbody.appendChild(el("div","trow",`<span class="name">${esc(n)}</span><span>${a||"—"}</span><span>${b||"—"}</span><span class="tt">${a+b}</span>`));});
+  });
+  sn.innerHTML=shead("Neveras","Suma de las dos barras",nn);
+  if(nn){any=true; sn.appendChild(nbody);} else sn.appendChild(el("div","empty","Todavía no se han contado las neveras."));
+  v.appendChild(sn);
+  // Notas
+  const notes=[];
+  [["Almacén",L.alm],["Barra 1",B1],["Barra 2",B2]].forEach(([t,x])=>{
+    const l=[...x.notes]; if(x.noteText.trim()) l.push(x.noteText.trim());
+    l.forEach(z=>notes.push(`<b>${t}:</b> ${esc(z)}`));
+  });
+  if(notes.length){const s=el("section",null,shead("Notas","",notes.length)); s.appendChild(el("div","notes-ro",notes.map(n=>`<p>${n}</p>`).join(""))); v.appendChild(s);}
+  if(!live) v.prepend(el("div","confirm","<span>⚠️ Sin conexión: estás viendo solo lo que hay en este móvil.</span>"));
+}
+function fmtTs(ts){const d=new Date(ts); return d.toLocaleDateString("es-ES",{weekday:"short",day:"numeric",month:"short"})+" · "+d.toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit"});}
+function renderRegistros(v){
+  const s=el("section",null,shead("Registros","Lo que ha enviado cada persona",REG.length));
+  if(!DB) s.appendChild(el("div","empty","Sin conexión: los registros no están disponibles."));
+  else if(!REG.length) s.appendChild(el("div","empty","Todavía no hay registros. Aparecen cuando alguien pulsa Enviar → Registrar."));
+  REG.forEach(r=>{
+    const open=V.openReg===r.id;
+    const c=el("div","reg"+(open?" open":""));
+    const h=el("button","reghead",`<span class="ra">${esc(AREA_NAME[r.area]||r.area)}</span><span class="rn">👤 ${esc(r.nombre||"—")}</span><span class="rt">${fmtTs(r.ts)}${r.editadoTs?` · ✏️ corregido ${hhmm(r.editadoTs)}${r.editadoPor?" ("+esc(r.editadoPor)+")":""}`:""}</span>`); h.type="button";
+    h.onclick=()=>{V.openReg=open?null:r.id; render();};
+    c.appendChild(h);
+    if(open){
+      if(r.data){
+        const X=normArea(r.area,r.data);
+        const prevR=REG.find(o=>o.area===r.area&&o.ts<r.ts&&o.data);
+        const cmp=!!(prevR&&V.cmp!==false);
+        const P=cmp?normArea(prevR.area,prevR.data):null;
+        const t=r.area==="alm"?almTable(X,P):barraTable(X,P);
+        const wrap=el("div","regbody");
+        if(prevR){
+          const bar=el("div","cmpbar",`<span>${cmp?"Comparando con el "+esc(fmtTs(prevR.ts))+" · "+esc(prevR.nombre||"—"):"Sin comparar"}</span>`);
+          const tg=el("button","chip"+(cmp?" on":""),"Comparar"); tg.type="button"; tg.onclick=()=>{V.cmp=!cmp; render();};
+          bar.appendChild(tg); wrap.appendChild(bar);
+        }
+        wrap.appendChild(t.n?t.box:el("div","empty","Este registro estaba vacío."));
+        const nb=notesBox(X); if(nb) wrap.appendChild(nb);
+        c.appendChild(wrap);
+      } else { const pre=el("pre"); pre.textContent=r.msg||""; c.appendChild(pre); }
+      const acts=el("div","regacts");
+      const cp=el("button","sec","Copiar"); cp.type="button"; cp.onclick=()=>{msgText=r.msg; copy();};
+      const wa=el("a","wa","WhatsApp"); wa.href="https://wa.me/?text="+encodeURIComponent(r.msg||""); wa.target="_blank"; wa.rel="noopener";
+      acts.append(cp,wa);
+      if(r.data&&DB){const ed=el("button","sec","✏️ Corregir"); ed.type="button"; ed.onclick=()=>startEdit(r); acts.prepend(ed);}
+      if(admin){const del=armBtn("Borrar registro",async()=>{try{await DB.collection("registros").doc(r.id).delete(); toast("Registro borrado");}catch(e){toast("No se ha podido borrar");}}); acts.appendChild(del);}
+      c.appendChild(acts);
+    }
+    s.appendChild(c);
+  });
+  v.appendChild(s);
 }
 
 /* ---------- Acceso admin: 5 toques en el título ---------- */
@@ -1034,12 +1585,26 @@ async function hash(t){
   catch(e){let h=0; for(const c of "recuento:"+t) h=(h*31+c.charCodeAt(0))|0; return "x"+h;}
 }
 let pwMode="enter";
+const DEFAULT_ENC="0000";
+let encOk=false;
+const PW_TXT={
+  enter:["Modo admin","Escribe la contraseña para editar las listas."],
+  change:["Contraseña de admin","Escribe la nueva contraseña de admin dos veces."],
+  enc:["Encargado","Escribe la contraseña del encargado."],
+  encChange:["Contraseña del encargado","Escribe la nueva contraseña del encargado dos veces."]
+};
 function openPw(mode){
   pwMode=mode;
-  $("pwTitle").textContent=mode==="enter"?"Modo admin":"Cambiar contraseña";
-  $("pwText").textContent=mode==="enter"?"Escribe la contraseña para editar las listas.":"Escribe la nueva contraseña dos veces.";
-  $("pw1").value=""; $("pw2").value=""; $("pw2").hidden=mode==="enter"; $("pwErr").hidden=true;
+  $("pwTitle").textContent=PW_TXT[mode][0];
+  $("pwText").textContent=PW_TXT[mode][1];
+  const single=mode==="enter"||mode==="enc";
+  $("pw1").value=""; $("pw2").value=""; $("pw2").hidden=single; $("pwErr").hidden=true;
+  $("pwOk").textContent=single?"Entrar":"Guardar";
   $("pwSheet").hidden=false; setTimeout(()=>$("pw1").focus(),50);
+}
+function openEncargado(){
+  if(admin||encOk) return go("encargado",{etab:"total"});
+  openPw("enc");
 }
 async function submitPw(){
   const a=$("pw1").value, err=t=>{$("pwErr").textContent=t; $("pwErr").hidden=false;};
@@ -1047,11 +1612,17 @@ async function submitPw(){
     const ok=C.passHash?(await hash(a))===C.passHash:a===DEFAULT_PASS;
     if(!ok){err("Contraseña incorrecta"); $("pw1").select(); return;}
     admin=true; $("pwSheet").hidden=true; render(); toast("Modo admin activado");
-    if(!C.passHash) setTimeout(()=>toast("Cambia la contraseña de fábrica en «Contraseña»"),1900);
+    if(!C.passHash) setTimeout(()=>toast("Cambia la contraseña de fábrica en «Clave admin»"),1900);
+  } else if(pwMode==="enc"){
+    const ok=C.encHash?(await hash("enc:"+a))===C.encHash:a===DEFAULT_ENC;
+    if(!ok){err("Contraseña incorrecta"); $("pw1").select(); return;}
+    encOk=true; $("pwSheet").hidden=true; go("encargado",{etab:"total"});
   } else {
     if(a.length<4){err("Usa al menos 4 caracteres"); return;}
     if(a!==$("pw2").value){err("Las dos contraseñas no coinciden"); return;}
-    C.passHash=await hash(a); syncConf(); $("pwSheet").hidden=true; toast("Contraseña cambiada");
+    if(pwMode==="encChange"){ C.encHash=await hash("enc:"+a); encOk=false; }
+    else C.passHash=await hash(a);
+    syncConf(); $("pwSheet").hidden=true; toast("Contraseña cambiada");
   }
 }
 let taps=[];
@@ -1063,8 +1634,16 @@ $("pwOk").onclick=submitPw;
 $("pw1").onkeydown=$("pw2").onkeydown=e=>{if(e.key==="Enter") submitPw();};
 $("pwCancel").onclick=()=>$("pwSheet").hidden=true;
 
-$("showBtn").onclick=openSheet; $("copyBtn").onclick=copy; $("copy2").onclick=copy;
-$("closeSheet").onclick=()=>$("sheet").hidden=true;
+$("showBtn").onclick=()=>{if(EDIT&&isCounting()&&curArea()===EDIT.k) saveEdit(); else openSend();}; $("copy2").onclick=copy;
+$("updBtn").onclick=actualizarReg;
+$("regBtn").onclick=registrar; $("waBtn").onclick=toWhatsApp;
+$("whoBtn").onclick=()=>{if(needName()){$("sendSheet").hidden=true; render(); toast("Hola, "+sendName);}};
+$("undoBtn").onclick=doUndo;
+$("themeBtn").onclick=cycleTheme; applyTheme();
+$("sendCancel").onclick=()=>$("sendSheet").hidden=true;
+$("sendSheet").onclick=e=>{if(e.target.id==="sendSheet")e.target.hidden=true};
+$("otherName").oninput=()=>renderPeople();
+$("closeSheet").onclick=()=>{$("sheet").hidden=true; msgText="";};
 $("sheet").onclick=e=>{if(e.target.id==="sheet")e.target.hidden=true};
 $("backBtn").onclick=()=>go(V.screen==="barra"?"barras":"home");
 $("resetBtn").onclick=()=>{
@@ -1073,9 +1652,10 @@ $("resetBtn").onclick=()=>{
   b.innerHTML=`<span>¿Borrar todo lo marcado en ${where}${live?" para todos":""}? Las listas de productos se quedan igual.</span><button type="button" id="no">Cancelar</button><button type="button" class="yes" id="yes">Borrar</button>`;
   b.querySelector("#no").onclick=()=>b.hidden=true;
   b.querySelector("#yes").onclick=()=>{
+    const ka=curArea(); pushUndoReset(ka,areaObj(ka));
     if(V.screen==="barra") L.barras[V.b]=emptyBarra(); else L.alm=emptyAlm();
     const c=cnt[curArea()]; if(c.ref){c.full=true; syncCounts();}
-    save(); b.hidden=true; render(); toast("Listo para el próximo finde");
+    save(); b.hidden=true; render(); toast("Borrado. Puedes deshacerlo con ↶");
   };
 };
 $("licClose").onclick=()=>$("licSheet").hidden=true;
