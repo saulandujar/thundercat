@@ -341,6 +341,14 @@ header:hover .logo{transform:rotate(-6deg) scale(1.06)}
 .chip:active,.tabs button:active,.add button:active,.addb:active{transform:scale(.95)}
 .step button:active{transform:scale(.88)}
 @media (prefers-reduced-motion:reduce){.tile,.tile b::after,.tile:hover::before{animation:none!important}.tile,.tile:hover,.tile:active{transform:none}}
+.resetbar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;background:var(--surface);border:2px solid var(--fg);padding:8px 10px 8px 12px;font-family:var(--cond);font-weight:600;text-transform:uppercase;letter-spacing:.03em;font-size:14px}
+.resetbar .chip{padding:6px 12px;font-size:13px}
+.resetpanel{display:flex;flex-direction:column;gap:10px;background:var(--amber-soft);border:2px solid var(--fg);border-top:0;margin-top:-18px;padding:12px 14px}
+.resetpanel label{font-family:var(--cond);font-weight:700;text-transform:uppercase;letter-spacing:.03em;font-size:14px}
+.resetpanel .pwin{border-radius:0;border:2px solid var(--fg)}
+.hint2{margin:0;font-size:13px;color:var(--muted)}
+.resetacts{display:flex;gap:8px;flex-wrap:wrap}
+.resetacts>*{flex:1 1 130px;height:46px}
 /* ---- Inicio más compacto y transiciones ---- */
 .tiles{max-width:380px;margin:22px auto 8px;gap:14px}
 .tile{min-height:118px;padding:18px 16px}
@@ -539,6 +547,7 @@ function normConf(c){
   c.cfg.nev.forEach(x=>{if(!c.nevLists[x.id]) c.nevLists[x.id]=[];});
   if(!Array.isArray(c.presets)) c.presets=[...NOTE_PRESETS];
   if(!Array.isArray(c.people)) c.people=["Saul"];
+  if(!c.reset||typeof c.reset!=="object") c.reset={ts:null,weekly:false,prev:0};
   return c;
 }
 function emptyAlm(){return {q:{}, t:{}, friaMode:"", notes:[], noteText:""};}
@@ -1603,9 +1612,11 @@ function renderEncargado(v){
   });
   v.appendChild(tabs);
   if(V.etab==="registros") return renderRegistros(v);
-  const last=k=>REG.find(r=>r.area===k&&r.data)||null;
+  const cut=totalCutoff();
+  resetBar(v,cut);
+  const last=k=>REG.find(r=>r.area===k&&r.data&&r.ts>=cut)||null;
   const RA=last("alm"), R1=last("b1"), R2=last("b2");
-  const sentTxt=r=>r?`Enviado ${fmtTs(r.ts)} · ${r.nombre||"—"}${r.editadoTs?" · ✏️ corregido":""}`:"Sin envíos todavía";
+  const sentTxt=r=>r?`Enviado ${fmtTs(r.ts)} · ${r.nombre||"—"}${r.editadoTs?" · ✏️ corregido":""}`:(cut?"Sin envíos desde el reinicio":"Sin envíos todavía");
   const info=el("div","lastsent");
   [["Almacén",RA],["Barra 1",R1],["Barra 2",R2]].forEach(([t,r])=>info.appendChild(el("div","ls"+(r?"":" none"),`<b>${t}</b><span>${esc(sentTxt(r))}</span>`)));
   v.appendChild(info);
@@ -1651,6 +1662,60 @@ function renderEncargado(v){
   });
   if(notes.length){const s=el("section",null,shead("Notas","",notes.length)); s.appendChild(el("div","notes-ro",notes.map(n=>`<p>${n}</p>`).join(""))); v.appendChild(s);}
   if(!DB) v.prepend(el("div","confirm","<span>⚠️ Sin conexión: no se pueden cargar los envíos.</span>"));
+}
+/* ---------- Reinicio del Total ahora ---------- */
+const WEEK=7*24*3600000;
+/* Semanal en hora local: mismo día de la semana y misma hora del reloj, aunque cambie el horario de verano */
+function lastWeekly(ts,now){
+  const b=new Date(ts), d=new Date(now);
+  d.setHours(b.getHours(),b.getMinutes(),0,0);
+  d.setDate(d.getDate()-((d.getDay()-b.getDay()+7)%7));
+  if(d.getTime()>now) d.setDate(d.getDate()-7);
+  return d.getTime();
+}
+function nextWeekly(ts,now){const d=new Date(lastWeekly(ts,now)); d.setDate(d.getDate()+7); return d.getTime();}
+function totalCutoff(){
+  const R=C.reset||{}, now=Date.now();
+  if(!R.ts) return 0;
+  if(R.weekly) return lastWeekly(R.ts,now);
+  return R.ts<=now?R.ts:(R.prev||0);
+}
+function nextReset(){
+  const R=C.reset||{}, now=Date.now();
+  if(!R.ts) return 0;
+  if(R.weekly) return nextWeekly(R.ts,now);
+  return R.ts>now?R.ts:0;
+}
+function toLocalInput(ts){const d=new Date(ts-new Date(ts).getTimezoneOffset()*60000); return d.toISOString().slice(0,16);}
+function fmtLong(ts){const d=new Date(ts); return d.toLocaleDateString("es-ES",{weekday:"short",day:"numeric",month:"short"})+" "+d.toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit"});}
+function setReset(ts,weekly){
+  const R=C.reset||{};
+  C.reset={ts:ts||null, weekly:!!weekly&&!!ts, prev:totalCutoff()};
+  syncConf(); render();
+}
+function resetBar(v,cut){
+  const R=C.reset||{}, nx=nextReset();
+  const bar=el("div","resetbar");
+  const txt=cut?`🗓️ Total desde <b>${esc(fmtLong(cut))}</b>`:"🗓️ Total con todos los envíos";
+  const extra=R.weekly?` · se reinicia cada semana${nx?`, próximo ${esc(fmtLong(nx))}`:""}`:nx?` · próximo reinicio ${esc(fmtLong(nx))}`:"";
+  bar.innerHTML=`<span>${txt}${extra}</span>`;
+  const b=el("button","chip"+(V.resetOpen?" on":""),V.resetOpen?"Cerrar":"Cambiar"); b.type="button";
+  b.onclick=()=>{V.resetOpen=!V.resetOpen; render();};
+  bar.appendChild(b); v.appendChild(bar);
+  if(!V.resetOpen) return;
+  const p=el("div","resetpanel");
+  p.innerHTML=`<label for="rsDate">Reiniciar el total el día y hora:</label>
+    <input type="datetime-local" id="rsDate" class="pwin" value="${R.ts?toLocalInput(R.ts):toLocalInput(Date.now())}">
+    <label class="check"><input type="checkbox" id="rsWeekly" ${R.weekly?"checked":""}> Repetir cada semana a esa hora</label>
+    <p class="hint2">Desde ese momento, el total solo cuenta los envíos nuevos. Los registros antiguos no se borran.</p>`;
+  const acts=el("div","resetacts");
+  const save=el("button","primary","Guardar"); save.type="button";
+  save.onclick=()=>{const val=$("rsDate").value; if(!val){toast("Elige una fecha"); return;} const ts=new Date(val).getTime(); if(isNaN(ts)){toast("Fecha no válida"); return;} V.resetOpen=false; setReset(ts,$("rsWeekly").checked); toast(ts>Date.now()?"Reinicio programado ✓":"Total reiniciado ✓");};
+  const now=el("button","sec","Reiniciar ahora"); now.type="button";
+  now.onclick=()=>{V.resetOpen=false; setReset(Date.now(),false); toast("Total reiniciado ✓");};
+  acts.append(save,now);
+  if(R.ts){const off=el("button","sec","Quitar reinicio"); off.type="button"; off.onclick=()=>{V.resetOpen=false; C.reset={ts:null,weekly:false,prev:0}; syncConf(); render(); toast("Ahora cuenta todos los envíos");}; acts.appendChild(off);}
+  p.appendChild(acts); v.appendChild(p);
 }
 function fmtTs(ts){const d=new Date(ts); return d.toLocaleDateString("es-ES",{weekday:"short",day:"numeric",month:"short"})+" · "+d.toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit"});}
 function renderRegistros(v){
