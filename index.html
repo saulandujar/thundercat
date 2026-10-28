@@ -1762,6 +1762,10 @@ function setCellValue(xml,ref,val){
     return val==null||val===0?`<c r="${ref}"${attrs}/>`:`<c r="${ref}"${attrs}><v>${xNum(val)}</v></c>`;
   });
 }
+function setFormula(xml,ref,formula,val){
+  const re=new RegExp('<c r="'+ref+'"([^>]*?)(/>|>([\\s\\S]*?)</c>)');
+  return xml.replace(re,(m,attrs)=>{attrs=attrs.replace(/\s*t="[^"]*"/,""); return `<c r="${ref}"${attrs}><f>${formula}</f><v>${xNum(val)}</v></c>`;});
+}
 function setCached(xml,ref,val){
   const re=new RegExp('<c r="'+ref+'"([^>]*?)>([\\s\\S]*?)</c>');
   return xml.replace(re,(m,attrs,inner)=>{
@@ -1778,8 +1782,9 @@ async function buildPedidoXlsx(qtys){
   for(const l of PED.lines){
     const q=+(qtys[l.name]||0);
     x=setCellValue(x,"D"+l.row,q||null);
-    if(l.f){F[l.row]=(l.precio+l.precio*l.iva)*q; x=setCached(x,"F"+l.row,F[l.row]);}
-    else F[l.row]=0;
+    F[l.row]=(l.precio+l.precio*l.iva)*q;
+    if(l.f) x=setCached(x,"F"+l.row,F[l.row]);
+    else x=setFormula(x,"F"+l.row,`(C${l.row}+(C${l.row}*E${l.row}))*D${l.row}`,F[l.row]); /* la hoja original tenía 0 fijo: se pone la fórmula */
   }
   for(const t of PED.tots){
     const r=+t.cell.slice(1);
@@ -1858,7 +1863,7 @@ function pedSuggest(l,st,lv){
 function pedQty(l,st,lv){const ov=C.pedOv&&C.pedOv[l.name]; return ov!=null?ov:pedSuggest(l,st,lv);}
 function pedRows(S){
   return PED.lines.map(l=>{const lvl=isLevelLine(l), lv=lvl?levelFor(l,S):undefined, st=lvl?null:stockFor(l,S), s=pedGet(l.name); const q=pedQty(l,st,lv);
-    return {l,st,lv,lvl,s,q,low:lvl?(!!lv&&lv<=(s.lvl!=null?s.lvl:2)):(st!=null&&s.min!=null&&st<s.min),manual:!!(C.pedOv&&C.pedOv[l.name]!=null),eur:l.f?q*(l.precio+l.precio*l.iva):0};});
+    return {l,st,lv,lvl,s,q,low:lvl?(!!lv&&lv<=(s.lvl!=null?s.lvl:2)):(st!=null&&s.min!=null&&st<s.min),manual:!!(C.pedOv&&C.pedOv[l.name]!=null),eur:q*(l.precio+l.precio*l.iva)};});
 }
 function pedLowCount(){const S=snapAt(Infinity,0); return pedRows(S).filter(r=>r.low).length;}
 
