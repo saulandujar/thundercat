@@ -265,7 +265,7 @@ pre.ro{border:0;margin:0;border-radius:0;font-size:15px}
 .regacts>*{flex:1 1 120px}
 .regacts a.wa{height:48px}
 .who .chip{font-size:16px;padding:10px 16px}
-#sendSheet .card{max-height:none}
+#sendSheet .card{max-height:calc(100dvh - 24px)}
 #sendSheet .acts .primary{flex:1 1 140px}
 #sendActs{flex-direction:column}
 #sendActs>*{flex:none;width:100%;height:auto;min-height:50px;white-space:normal;line-height:1.05;padding:9px 12px 7px;overflow-wrap:anywhere;box-sizing:border-box}
@@ -448,6 +448,43 @@ header h1{font-size:clamp(28px,9vw,46px)}
 @keyframes sheetUp{from{transform:translateY(40px);opacity:.4}}
 section{animation:none}
 
+/* ---- Ajuste fino para móvil ---- */
+.wrap{min-height:calc(100dvh - 24px)}
+body:has(#bar:not([hidden])) .wrap{min-height:calc(100dvh - 132px)}
+.wrap>footer{margin-top:auto;padding-top:56px;padding-bottom:8px}
+body{padding-bottom:calc(24px + env(safe-area-inset-bottom,0px))}
+button,a,input,select,label{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+/* iPhone hace zoom en campos con letra < 16px: todos a 16px como mínimo */
+input,select,textarea{font-size:16px!important}
+.step input{font-size:24px!important}
+.numin{font-size:22px!important}
+.adm-head input.ttl,.adm-sub input.ttl{font-size:22px!important}
+/* Cabecera más compacta dentro de las secciones */
+header h1{font-size:clamp(26px,8.6vw,46px)}
+body:not(.home) header{padding:10px 14px;gap:8px 12px}
+body:not(.home) header .logo{width:46px}
+body:not(.home) header h1{font-size:clamp(26px,8.4vw,40px)}
+body:not(.home) header .date{font-size:12px}
+header .hbtns .ghost{padding:5px 10px;font-size:12px}
+.themebtn{width:40px;height:40px;font-size:18px}
+/* Ventanas que suben: nunca más altas que la pantalla */
+.sheet .card{max-height:calc(100dvh - 24px);overflow-y:auto;-webkit-overflow-scrolling:touch}
+#sendSheet #sendActs>*{flex:none}
+.sheet .ghost{border-radius:0;border:2px solid var(--line);height:44px;font-family:var(--cond);font-weight:700;text-transform:uppercase;letter-spacing:.05em;font-size:14px}
+/* Pestañas del encargado sin pisarse */
+.tabs4{gap:2px;padding:3px}
+.tabs4 button{font-size:clamp(15px,4.6vw,20px);letter-spacing:.02em;padding:0 1px;min-width:0;white-space:nowrap}
+/* Contadores un poco más estrechos en móviles pequeños para que el nombre respire */
+@media (max-width:400px){
+  .step{gap:3px}
+  .step button{width:36px;height:40px}
+  .step input{width:50px}
+  .row{padding:8px 8px 8px 12px;gap:8px}
+  .name{font-size:15.5px}
+  .shead h2{font-size:28px}
+  .tile b{font-size:44px}
+  .pedbig b{font-size:26px}
+}
 html.no-anim *,html.no-anim *::before,html.no-anim *::after{animation:none!important;transition:none!important}
 html.no-anim .tile:hover,html.no-anim .tile:active{transform:none}
 </style>
