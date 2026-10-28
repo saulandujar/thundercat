@@ -372,6 +372,8 @@ header:hover .logo{transform:rotate(-6deg) scale(1.06)}
 .btlpop{animation:btlpop .35s cubic-bezier(.3,1.7,.5,1)}
 @keyframes btlpop{0%{transform:scale(.9)}60%{transform:scale(1.07)}100%{transform:none}}
 /* ---- Pedido, consumo y recordatorio ---- */
+header h1{font-size:clamp(28px,9.5vw,46px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+header .htext{min-width:0}
 .tabs4 button{font-size:17px;padding:0 1px;letter-spacing:.02em;min-width:0}
 header .htext{min-width:0}
 header h1{font-size:clamp(28px,9vw,46px)}
@@ -388,8 +390,7 @@ header h1{font-size:clamp(28px,9vw,46px)}
 .pedbig .bad b{color:var(--accent)}
 .pedbig span{font-family:var(--cond);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.03em;opacity:.85}
 .pedsrc{margin:0;font-size:12.5px;color:var(--muted);font-family:var(--cond);font-weight:600;text-transform:uppercase;letter-spacing:.02em}
-.pedacts{display:flex;gap:8px;flex-wrap:wrap}
-.pedacts>*{flex:1 1 140px;height:48px}
+.pedacts{display:flex;gap:8px}
 .prow.low{box-shadow:inset 4px 0 0 var(--accent)}
 .pedit{display:flex;flex-direction:column;gap:8px;padding:10px 12px 12px 14px;border-top:1px solid var(--line)}
 .pnums{display:flex;gap:8px;flex-wrap:wrap}
@@ -542,7 +543,6 @@ html.no-anim .tile:hover,html.no-anim .tile:active{transform:none}
     <div class="setrow"><span>Tema</span><div class="seg" id="segTheme"></div></div>
     <div class="setrow"><span>Animaciones</span><div class="seg" id="segAnim"></div></div>
     <p class="hint2">«Auto» sigue lo que tenga puesto el móvil (modo oscuro y «reducir movimiento»). Se guarda solo en este móvil.</p>
-    <div class="setrow"><span>Recordatorio</span><button class="sec" id="icsBtn" type="button">📅 Añadir aviso al calendario (domingos 05:30)</button></div>
     <button class="primary" id="setClose" type="button">Listo</button>
   </div>
 </div>
@@ -701,6 +701,11 @@ function applyPatches(){
       ["Barril Estrella","Barril Turia"].forEach(n=>{if(!l.some(x=>x.toLowerCase()===n.toLowerCase())) l.push(n);});
     }
     C.patches.push("barriles-lleno"); changed=true;
+  }
+  if(!C.patches.includes("hint-cajas")){
+    const sec=C.cfg.alm.find(x=>x.key==="lleno");
+    if(sec&&(!sec.hint||sec.hint==="Lo que queda en el almacén")) sec.hint="En cajas · lo que queda en el almacén";
+    C.patches.push("hint-cajas"); changed=true;
   }
   if(changed){syncConf(); render();}
 }
@@ -1104,7 +1109,6 @@ function tile(title,sub,main,fn,cls){
 }
 function marked(n){return n?`${n} marcado${n===1?"":"s"}`:"Sin empezar";}
 function renderHome(v){
-  reminderBanner(v);
   const t=el("div","tiles");
   const who=["alm","b1","b2"].map(whoTxt).filter(Boolean);
   const n=countAlm()+countBarra(1)+countBarra(2);
@@ -1113,7 +1117,6 @@ function renderHome(v){
   v.appendChild(t);
 }
 function renderInv(v){
-  reminderBanner(v);
   const t=el("div","tiles");
   t.append(tile("Almacén",C.cfg.alm.map(s=>s.title.toLowerCase()).join(", ")+" · "+marked(countAlm())+(whoTxt("alm")?"<br>"+esc(whoTxt("alm"))+" contando":""),true,()=>go("almacen")),
            tile("Barra","Botellas y neveras"+((whoTxt("b1")||whoTxt("b2"))?"<br>"+[whoTxt("b1")&&esc(whoTxt("b1"))+" en B1",whoTxt("b2")&&esc(whoTxt("b2"))+" en B2"].filter(Boolean).join(" · "):""),true,()=>go("barras")));
@@ -1379,7 +1382,7 @@ function newCatBox(){
 function renderNeveras(v){
   const groups=C.cfg.nev;
   toolbar(v,"Buscar en las neveras…");
-  const s=el("section",null,shead("Neveras","Lo que queda en las neveras de esta barra",Object.keys(B().nev).length));
+  const s=el("section",null,shead("Neveras","En unidades sueltas (botellas y latas)",Object.keys(B().nev).length));
   if(!groups.length) s.appendChild(el("div","empty",admin?"No hay grupos. Crea uno abajo.":"Todavía no hay productos para las neveras."));
   let shown=0;
   groups.forEach((g,gi)=>{
@@ -1934,7 +1937,7 @@ function consumoData(){
 }
 function niceMax(m){if(m<=0) return 1; const p=Math.pow(10,Math.floor(Math.log10(m))), f=m/p; return (f<=1?1:f<=2?2:f<=2.5?2.5:f<=5?5:10)*p;}
 function barChart(vals,labels,fmt,caption){
-  const W=320,H=150,L=34,R=8,T=14,B=24, n=vals.length, max=niceMax(Math.max(0,...vals.map(x=>x||0)));
+  const W=320,H=150,L=46,R=8,T=16,B=24, n=vals.length, max=niceMax(Math.max(0,...vals.map(x=>x||0)));
   const bw=Math.min(28,(W-L-R)/n*0.6), step=(W-L-R)/n, y=x=>T+(H-T-B)*(1-x/max);
   let g="";
   [0,max/2,max].forEach(t=>{g+=`<line x1="${L}" x2="${W-R}" y1="${y(t)}" y2="${y(t)}" class="cgrid"/><text x="${L-5}" y="${y(t)+3.5}" text-anchor="end" class="ctick">${fmt(t)}</text>`;});
@@ -2306,7 +2309,6 @@ $("whoBtn").onclick=()=>{if(needName()){$("sendSheet").hidden=true; render(); to
 $("undoBtn").onclick=doUndo;
 $("themeBtn").onclick=openSettings; applyTheme();
 $("setClose").onclick=()=>$("setSheet").hidden=true;
-$("icsBtn").onclick=downloadIcs;
 $("setSheet").onclick=e=>{if(e.target.id==="setSheet")e.target.hidden=true};
 try{matchMedia("(prefers-reduced-motion: reduce)").addEventListener("change",applyTheme);}catch(e){}
 $("sendCancel").onclick=()=>$("sendSheet").hidden=true;
