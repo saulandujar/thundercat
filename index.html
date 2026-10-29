@@ -372,6 +372,10 @@ header:hover .logo{transform:rotate(-6deg) scale(1.06)}
 .btlpop{animation:btlpop .35s cubic-bezier(.3,1.7,.5,1)}
 @keyframes btlpop{0%{transform:scale(.9)}60%{transform:scale(1.07)}100%{transform:none}}
 /* ---- Pedido, consumo y recordatorio ---- */
+.nevrow{grid-template-columns:minmax(0,1fr);gap:6px}
+.nevctr{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.nevlab{display:flex;flex-direction:column;gap:3px;align-items:flex-start;min-width:0}
+.nevlab>span{font-family:var(--cond);font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
 .willorder{display:block;margin-top:3px;font-family:var(--cond);font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:.03em;color:var(--muted)}
 .willorder.yes{color:var(--accent)}
 header h1{font-size:clamp(28px,9.5vw,46px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
@@ -671,7 +675,7 @@ function normConf(c){
   return c;
 }
 function emptyAlm(){return {q:{}, t:{}, friaMode:"", notes:[], noteText:""};}
-function emptyBarra(){return {alc:{}, nev:{}, t:{}, notes:[], noteText:""};}
+function emptyBarra(){return {alc:{}, nev:{}, nevc:{}, t:{}, notes:[], noteText:""};}
 function loadLocal(){
   try{const r=localStorage.getItem(LKEY); if(r){const d=JSON.parse(r); return {alm:Object.assign(emptyAlm(),d.alm), barras:{1:Object.assign(emptyBarra(),d.barras&&d.barras[1]),2:Object.assign(emptyBarra(),d.barras&&d.barras[2])}};}}catch(e){}
   return {alm:emptyAlm(), barras:{1:emptyBarra(),2:emptyBarra()}};
@@ -776,7 +780,7 @@ async function startDb(){
    Cada zona (almacén, barra 1, barra 2) es un documento compartido.
    Se envían solo los cambios, así dos personas pueden contar a la vez. */
 const AREAS={alm:"inv/almacen", b1:"inv/barra1", b2:"inv/barra2"};
-const MAPS=["q","alc","nev","t"];
+const MAPS=["q","alc","nev","nevc","t"];
 let cdb=null, live=false, dragging=false, DB=null, REG=[], regReady=false, EDIT=null;
 const cnt={}; for(const k in AREAS) cnt[k]={ref:null, base:null, busy:false, again:false, full:false, noteTimer:null};
 function areaObj(k){return k==="alm"?L.alm:L.barras[k==="b1"?1:2];}
@@ -867,7 +871,7 @@ function softRender(){if(!dragging&&!isTyping()) render();}
 function isCounting(){return V.screen==="almacen"||V.screen==="barra";}
 function changedKeys(prev,cur){
   const out=[];
-  for(const f of ["q","alc","nev"]){const A=prev[f]||{},B=cur[f]||{}; for(const key of new Set([...Object.keys(A),...Object.keys(B)])) if(JSON.stringify(A[key])!==JSON.stringify(B[key])) out.push(f+":"+key);}
+  for(const f of ["q","alc","nev","nevc"]){const A=prev[f]||{},B=cur[f]||{}; for(const key of new Set([...Object.keys(A),...Object.keys(B)])) if(JSON.stringify(A[key])!==JSON.stringify(B[key])) out.push(f+":"+key);}
   return out;
 }
 function otherChanged(prev,cur){return ["friaMode","notes","noteText"].some(x=>JSON.stringify(prev[x])!==JSON.stringify(cur[x]));}
@@ -879,7 +883,7 @@ function trackChange(){
   if(!keys.length&&!other) return;
   (undo[k]=undo[k]||[]).push({prev, keys, other}); if(undo[k].length>40) undo[k].shift();
   const now=Date.now(); cur.t=cur.t||{};
-  keys.forEach(fk=>{recent[fk]=now; cur.t[fk]={n:sendName||"",ts:now};});
+  keys.forEach(fk=>{recent[fk]=now; cur.t[fk]={n:sendName||"",ts:now}; if(fk.startsWith("nevc:")) recent["nev:"+fk.slice(5)]=now;});
   if(prev.friaMode!==cur.friaMode) recent.fria=now;
   if(keys.length||prev.friaMode!==cur.friaMode){clearTimeout(trackChange.t); trackChange.t=setTimeout(softRender,10500);}
   prevArea[k]=clone(cur);
@@ -1140,7 +1144,22 @@ function renderAdminBar(){
 }
 
 function countAlm(){return Object.keys(L.alm.q).length+(L.alm.friaMode?1:0);}
-function countBarra(b){const B=L.barras[b]; return Object.keys(B.alc).length+Object.keys(B.nev).length;}
+/* Neveras: se cuentan cajas y unidades sueltas por separado */
+function nevKeys(X){return [...new Set([...Object.keys(X.nev||{}),...Object.keys(X.nevc||{})])].filter(k=>(X.nev||{})[k]>0||(X.nevc||{})[k]>0);}
+function nevHas(X,n){return ((X.nev||{})[n]||0)>0||((X.nevc||{})[n]||0)>0;}
+function nevPack(n){
+  try{const k=nrm(n); const l=PED.lines.find(l=>pedLinks(l).some(x=>nrm(x)===k)); if(l) return pedPack(l);}catch(e){}
+  return 24;
+}
+function nevUnits(X,n){return ((X.nev||{})[n]||0)+((X.nevc||{})[n]||0)*nevPack(n);}
+function nevTxt(X,n,short){
+  const c=(X.nevc||{})[n]||0, u=(X.nev||{})[n]||0, p=[];
+  if(c) p.push(short?half(c)+"c":`${half(c)} ${c===1?"caja":"cajas"}`);
+  if(u) p.push(short?String(u):`${u} ${u===1?"suelta":"sueltas"}`);
+  return p.join(short?"+":" + ")||(short?"—":"0");
+}
+function nevTotTxt(units,n){const pk=nevPack(n), c=Math.floor(units/pk), u=units-c*pk; return (c?c+"c":"")+(c&&u?"+":"")+(u||!c?u:"");}
+function countBarra(b){const B=L.barras[b]; return Object.keys(B.alc).length+nevKeys(B).length;}
 function tile(title,sub,main,fn,cls){
   const t=el("button","tile"+(main?" main":"")+(cls?" "+cls:""),`<b>${title}</b><span>${sub}</span>`); t.type="button";
   t.onclick=()=>{ if(t.classList.contains("tap")) return; t.classList.add("tap"); setTimeout(()=>{t.classList.remove("tap"); fn();},reduceMotion()?0:120); };
@@ -1351,7 +1370,7 @@ function renderBarra(v){
   presBanner(v);
   const tabs=el("div","tabs");
   [["botellas","Botellas"],["neveras","Neveras"]].forEach(([k,l])=>{
-    const n=k==="botellas"?Object.keys(B().alc).length:Object.keys(B().nev).length;
+    const n=k==="botellas"?Object.keys(B().alc).length:nevKeys(B()).length;
     const b=el("button",V.tab===k?"on":"",l+(n?` · ${n}`:"")); b.type="button"; b.id="tab-"+k;
     b.onclick=()=>{V.tab=k; V.q=""; render();};
     tabs.appendChild(b);
@@ -1421,7 +1440,7 @@ function newCatBox(){
 function renderNeveras(v){
   const groups=C.cfg.nev;
   toolbar(v,"Buscar en las neveras…");
-  const s=el("section",null,shead("Neveras","En unidades sueltas (botellas y latas)",Object.keys(B().nev).length));
+  const s=el("section",null,shead("Neveras","Cajas enteras y unidades sueltas",nevKeys(B()).length));
   if(!groups.length) s.appendChild(el("div","empty",admin?"No hay grupos. Crea uno abajo.":"Todavía no hay productos para las neveras."));
   let shown=0;
   groups.forEach((g,gi)=>{
@@ -1433,19 +1452,26 @@ function renderNeveras(v){
       h.appendChild(armBtn("Borrar grupo "+g.title,()=>{delete C.nevLists[g.id]; groups.splice(gi,1);}));
       s.appendChild(h);
       list.forEach((name,i)=>s.appendChild(adminItem({name,i,list,id:"en-"+g.id+"-"+i,
-        onRename:(o,nw)=>{list[i]=nw; [1,2].forEach(b=>{const nv=L.barras[b].nev; if(nv[o]!=null){nv[nw]=nv[o]; delete nv[o];}});},
-        onDelete:()=>{list.splice(i,1); [1,2].forEach(b=>delete L.barras[b].nev[name]);},
+        onRename:(o,nw)=>{list[i]=nw; [1,2].forEach(b=>{["nev","nevc"].forEach(f=>{const nv=L.barras[b][f]||{}; if(nv[o]!=null){nv[nw]=nv[o]; delete nv[o];}});});},
+        onDelete:()=>{list.splice(i,1); [1,2].forEach(b=>{delete L.barras[b].nev[name]; if(L.barras[b].nevc) delete L.barras[b].nevc[name];});},
         targets:groups.filter(x=>x.id!==g.id).map(x=>({id:x.id,label:x.title||"Sin título"})),
         onMove:to=>{const tl=C.nevLists[to]; if(tl.includes(name)){toast("Ya está en ese grupo"); return;} list.splice(i,1); tl.push(name); toast("Movido");}})));
       s.appendChild(addBox("add-nv-"+g.id,"Añadir a "+(g.title||"este grupo").toLowerCase()+"…",val=>{if(list.some(x=>x.toLowerCase()===val.toLowerCase())) return false; list.push(val);}));
       return;
     }
-    const names=visibleNames(list,n=>B().nev[n]>0,n=>"nev:"+n);
+    const names=visibleNames(list,n=>nevHas(B(),n),n=>"nev:"+n);
     if(!names.length) return;
     if(g.title) s.appendChild(el("div","sub",esc(g.title)));
     names.forEach(name=>{shown++;
-      const val=B().nev[name]||0, r=el("div","row"+(val>0?" set":""),`<div class="name">${esc(name)}${updLine("nev:"+name)}</div>`);
-      r.appendChild(stepper(val,1,"nev-"+g.id+"-"+idOf(name),name,x=>{if(x>0)B().nev[name]=x; else delete B().nev[name]; commitAll();}));
+      const X=B(); X.nevc=X.nevc||{};
+      const u=X.nev[name]||0, c=X.nevc[name]||0, tu=(X.t||{})["nev:"+name], tc=(X.t||{})["nevc:"+name];
+      const r=el("div","row nevrow"+(u>0||c>0?" set":""),`<div class="name">${esc(name)}${updLine(tc&&(!tu||tc.ts>tu.ts)?"nevc:"+name:"nev:"+name)}</div>`);
+      const ctr=el("div","nevctr");
+      const lab=(t,st)=>{const w=el("div","nevlab",`<span>${t}</span>`); w.appendChild(st); return w;};
+      ctr.append(
+        lab("Cajas",stepper(c,1,"nevc-"+g.id+"-"+idOf(name),"Cajas de "+name,x=>{const Y=B(); Y.nevc=Y.nevc||{}; if(x>0)Y.nevc[name]=x; else delete Y.nevc[name]; commitAll();})),
+        lab("Sueltas",stepper(u,1,"nev-"+g.id+"-"+idOf(name),"Sueltas de "+name,x=>{if(x>0)B().nev[name]=x; else delete B().nev[name]; commitAll();})));
+      r.appendChild(ctr);
       s.appendChild(r);
     });
   });
@@ -1517,8 +1543,8 @@ function msgBarra(b){
     const lines=C.alcLists[c.id].filter(n=>X.alc[n]).map(n=>`• ${n}: ${summary(X.alc[n])}`);
     if(lines.length) body.push(`${c.icon||"🍾"} *${c.title.toUpperCase()}*\n`+lines.join("\n"));
   }
-  const nevItems=[]; C.cfg.nev.forEach(g=>C.nevLists[g.id].forEach(n=>{if(X.nev[n]>0&&!nevItems.includes(n)) nevItems.push(n);}));
-  if(nevItems.length) body.push("🧊 *NEVERAS*\n"+nevItems.map(n=>`• ${X.nev[n]} ${n}`).join("\n"));
+  const nevItems=[]; C.cfg.nev.forEach(g=>C.nevLists[g.id].forEach(n=>{if(nevHas(X,n)&&!nevItems.includes(n)) nevItems.push(n);}));
+  if(nevItems.length) body.push("🧊 *NEVERAS*\n"+nevItems.map(n=>`• ${n}: ${nevTxt(X,n)}`).join("\n"));
   const nl=notesLines(X); if(nl) body.push(nl);
   return {title:"INVENTARIO BARRA "+b, body};
 }
@@ -1568,7 +1594,7 @@ function missingGroups(area){
   } else {
     const X=L.barras[area==="b1"?1:2];
     C.cfg.cats.forEach(c=>{const l=C.alcLists[c.id]; if(l.length&&!l.some(n=>X.alc[n])) out.push(c.title);});
-    if(C.cfg.nev.length&&!Object.keys(X.nev).length) out.push("Neveras");
+    if(C.cfg.nev.length&&!nevKeys(X).length) out.push("Neveras");
   }
   return out;
 }
@@ -1807,7 +1833,7 @@ function startPedidos(db){
   try{db.collection("pedidos").orderBy("ts","desc").limit(80).onSnapshot(qs=>{PEDS=qs.docs.map(d=>Object.assign({id:d.id},d.data())); if(V.screen==="encargado") softRender();},()=>{});}catch(e){}
 }
 function pedGet(name){return (C.ped&&C.ped[name])||{};}
-function pedSet(name,patch){if(["min","ideal","lvl","kg","link","pack"].some(k=>k in patch)&&C.pedOv&&C.pedOv[name]!=null) delete C.pedOv[name]; C.ped=C.ped||{}; C.ped[name]=Object.assign({},C.ped[name]||{},patch); for(const k in C.ped[name]) if(C.ped[name][k]==null) delete C.ped[name][k]; syncConf(); render();}
+function pedSet(name,patch,quiet){if(["min","ideal","lvl","kg","link","pack"].some(k=>k in patch)&&C.pedOv&&C.pedOv[name]!=null) delete C.pedOv[name]; C.ped=C.ped||{}; C.ped[name]=Object.assign({},C.ped[name]||{},patch); for(const k in C.ped[name]) if(C.ped[name][k]==null) delete C.ped[name][k]; syncConf(); if(!quiet) render();}
 function pedLinks(l){const s=pedGet(l.name); return Array.isArray(s.link)?s.link:((PED_DEF[l.name]||{}).link||[]);}
 function pedPack(l){const s=pedGet(l.name); if(s.pack) return s.pack; const d=PED_DEF[l.name]||{}; if(d.pack) return d.pack; const m=/caja\s*(\d+)/i.exec(l.fmt); return m?+m[1]:/caja/i.test(l.fmt)?24:1;}
 function pedUnit(l,n){const f=l.fmt.toLowerCase(); const pl=n!==1;
@@ -1835,7 +1861,7 @@ function stockFor(l,S){
       for(const n of C.almLists[g.id]||[]) if(names.includes(nrm(n))){found=true; st+=(S.XA.q[g.id+"|"+n]||0);} } }
   for(const c of C.cfg.cats) for(const n of C.alcLists[c.id]||[]) if(names.includes(nrm(n))){found=true; st+=bottleEq(S.B1.alc[n])+bottleEq(S.B2.alc[n]);}
   const pk=pedPack(l);
-  for(const g of C.cfg.nev) for(const n of C.nevLists[g.id]||[]) if(names.includes(nrm(n))){found=true; st+=((S.B1.nev[n]||0)+(S.B2.nev[n]||0))/pk;}
+  for(const g of C.cfg.nev) for(const n of C.nevLists[g.id]||[]) if(names.includes(nrm(n))){found=true; st+=((S.B1.nev[n]||0)+(S.B2.nev[n]||0))/pk+((S.B1.nevc||{})[n]||0)+((S.B2.nevc||{})[n]||0);}
   return found?st:null;
 }
 /* Productos de la barra medidora (1 a 5): nivel más bajo de lo enlazado, o null */
@@ -1881,12 +1907,12 @@ function renderPedido(v){
     <p class="pedsrc">Stock según los últimos envíos: ${[["Almacén",S.RA],["B1",S.R1],["B2",S.R2]].map(([t,r])=>`${t} ${r?esc(fmtTs(r.ts)):"—"}`).join(" · ")}</p>`;
   if(!anyMin) sum.appendChild(el("div","confirm","<span>👉 Pulsa <b>✎ Cantidades</b> y pon cuánto quieres tener de cada producto. Así la app calcula sola lo que hay que pedir.</span>"));
   const acts=el("div","pedacts");
-  const dl=el("button","primary","⬇ Descargar Excel"); dl.type="button"; dl.onclick=()=>downloadPedido(rows);
-  const mk=el("button","sec","✓ Marcar como pedido"); mk.type="button"; mk.onclick=()=>marcarPedido(rows);
+  const dl=el("button","primary","⬇ Descargar Excel"); dl.type="button"; dl.onclick=()=>downloadPedido(pedRows(snapAt(Infinity,0)));
+  const mk=el("button","sec","✓ Marcar como pedido"); mk.type="button"; mk.onclick=()=>marcarPedido(pedRows(snapAt(Infinity,0)));
   acts.append(dl,mk);
   if(C.pedOv&&Object.keys(C.pedOv).length){const rs=el("button","sec","↺ Quitar cambios a mano"); rs.type="button"; rs.onclick=()=>{C.pedOv={}; syncConf(); render(); toast("Cantidades recalculadas");}; acts.appendChild(rs);}
   sum.appendChild(acts);
-  if(V.pedAsk){const a=el("div","confirm",`<span>¿Ya lo has mandado a oficina? Márcalo como pedido para que cuente en el consumo.</span>`); const y=el("button","yes","Sí, marcar"); y.type="button"; y.onclick=()=>marcarPedido(rows); const n=el("button",null,"Todavía no"); n.type="button"; n.onclick=()=>{V.pedAsk=false; render();}; a.append(n,y); sum.appendChild(a);}
+  if(V.pedAsk){const a=el("div","confirm",`<span>¿Ya lo has mandado a oficina? Márcalo como pedido para que cuente en el consumo.</span>`); const y=el("button","yes","Sí, marcar"); y.type="button"; y.onclick=()=>marcarPedido(pedRows(snapAt(Infinity,0))); const n=el("button",null,"Todavía no"); n.type="button"; n.onclick=()=>{V.pedAsk=false; render();}; a.append(n,y); sum.appendChild(a);}
   v.appendChild(sum);
   // Filtros
   const tb=el("div","tchips");
@@ -1910,9 +1936,11 @@ function renderPedido(v){
   });
   if(!shown) v.appendChild(el("div","empty big",anyMin?"No hace falta pedir nada 🎉":"Todavía no has puesto cantidades. Pulsa ✎ Cantidades."));
 }
-function numInput(id,val,ph,onSet){
+function numInput(id,val,ph,onSet,onLive){
   const i=document.createElement("input"); i.type="text"; i.inputMode="decimal"; i.id=id; i.className="numin"; i.placeholder=ph; i.value=val!=null?fmtQ(val):""; i.autocomplete="off";
-  i.onchange=()=>{const t=i.value.trim(); onSet(t===""?null:Math.max(0,parseQty(t)));};
+  const val_=()=>{const t=i.value.trim(); return t===""?null:Math.max(0,parseQty(t));};
+  i.oninput=()=>{if(onLive) onLive(val_());};
+  i.onchange=()=>{const v=val_(); if(onLive) onLive(v); setTimeout(()=>onSet(v),350);}; /* se redibuja un poco después, para no comerse el toque en otro botón */
   i.onfocus=()=>i.select(); i.onkeydown=e=>{if(e.key==="Enter") i.blur();}; i.enterKeyHint="done"; return i;
 }
 function renderPedEdit(v,rows){
@@ -1933,10 +1961,10 @@ function renderPedEdit(v,rows){
       const nums=el("div","pnums");
       const lab=(t,inp)=>{const w=el("label","pnum",`<span>${t}</span>`); w.appendChild(inp); return w;};
       if(r.lvl){
-        nums.append(lab("Pedir si nivel ≤",numInput("pv-"+l.row,r.s.lvl!=null?r.s.lvl:2,"2",x=>pedSet(l.name,{lvl:x==null?null:Math.max(1,Math.min(5,Math.round(x)))}))),
-                    lab("Cantidad ("+pedUnit(l,2)+")",numInput("pk-"+l.row,r.s.kg,"—",x=>pedSet(l.name,{kg:x}))));
-      } else nums.append(lab("Quiero tener",numInput("pi-"+l.row,r.s.ideal,"—",x=>pedSet(l.name,{ideal:x}))),lab("Pedir si baja de",numInput("pm-"+l.row,r.s.min,"opcional",x=>pedSet(l.name,{min:x}))));
-      if(!/^kg/i.test(l.fmt)&&!/^barril/i.test(l.fmt)) nums.appendChild(lab("Uds/caja",numInput("pp-"+l.row,pedPack(l),"1",x=>pedSet(l.name,{pack:x&&x>0?x:null}))));
+        nums.append(lab("Pedir si nivel ≤",numInput("pv-"+l.row,r.s.lvl!=null?r.s.lvl:2,"2",x=>pedSet(l.name,{lvl:x==null?null:Math.max(1,Math.min(5,Math.round(x)))}),x=>pedSet(l.name,{lvl:x==null?null:Math.max(1,Math.min(5,Math.round(x)))},true))),
+                    lab("Cantidad ("+pedUnit(l,2)+")",numInput("pk-"+l.row,r.s.kg,"—",x=>pedSet(l.name,{kg:x}),x=>pedSet(l.name,{kg:x},true))));
+      } else nums.append(lab("Quiero tener",numInput("pi-"+l.row,r.s.ideal,"—",x=>pedSet(l.name,{ideal:x}),x=>pedSet(l.name,{ideal:x},true))),lab("Pedir si baja de",numInput("pm-"+l.row,r.s.min,"opcional",x=>pedSet(l.name,{min:x}),x=>pedSet(l.name,{min:x},true))));
+      if(!/^kg/i.test(l.fmt)&&!/^barril/i.test(l.fmt)) nums.appendChild(lab("Uds/caja",numInput("pp-"+l.row,pedPack(l),"1",x=>pedSet(l.name,{pack:x&&x>0?x:null}),x=>pedSet(l.name,{pack:x&&x>0?x:null},true))));
       row.appendChild(nums);
       const links=pedLinks(l), lk=el("div","plinks");
       links.forEach(n=>{const c=el("button","chip on",esc(n)+'<span class="x">✕</span>'); c.type="button"; c.onclick=()=>pedSet(l.name,{link:links.filter(x=>x!==n)}); lk.appendChild(c);});
@@ -2136,9 +2164,9 @@ function barraTable(X,P){
     names.forEach(k=>{n++; const r=A_(X,k), eq=bottleEq(r);
       box.appendChild(row2(k,r?esc(summary(r)):"—","wide"+(eq===0?" low":""),P?dBadge(eq,bottleEq(A_(P,k)),fmtEq):""));});
   }
-  const nv=(Y,k)=>Y&&Y.nev?(Y.nev[k]||0):0;
+  const nv=(Y,k)=>Y?nevUnits(Y,k):0;
   const nev=[]; C.cfg.nev.forEach(g=>C.nevLists[g.id].forEach(k=>{if((nv(X,k)>0||nv(P,k)>0)&&!nev.includes(k)) nev.push(k);}));
-  if(nev.length){box.appendChild(el("div","sub","Neveras")); nev.forEach(k=>{n++; box.appendChild(row2(k,nv(X,k),nv(X,k)===0?"low":"",P?dBadge(nv(X,k),nv(P,k),String):""));});}
+  if(nev.length){box.appendChild(el("div","sub","Neveras")); nev.forEach(k=>{n++; box.appendChild(row2(k,X?esc(nevTxt(X,k)):"0",nv(X,k)===0?"low wide":"wide",P?dBadge(nv(X,k),nv(P,k),x=>x+" uds"):""));});}
   return {box,n};
 }
 function notesBox(X){
@@ -2202,13 +2230,13 @@ function renderEncargado(v){
   // Neveras
   const sn=el("section"); const nbody=el("div"); let nn=0;
   C.cfg.nev.forEach(g=>{
-    const names=C.nevLists[g.id].filter(n=>B1.nev[n]>0||B2.nev[n]>0); if(!names.length) return;
+    const names=C.nevLists[g.id].filter(n=>nevHas(B1,n)||nevHas(B2,n)); if(!names.length) return;
     if(g.title) nbody.appendChild(el("div","sub",esc(g.title)));
     nbody.appendChild(totHead());
-    names.forEach(n=>{nn++; const a=B1.nev[n]||0, b=B2.nev[n]||0;
-      nbody.appendChild(el("div","trow",`<span class="name">${esc(n)}</span><span>${a||"—"}</span><span>${b||"—"}</span><span class="tt">${a+b}</span>`));});
+    names.forEach(n=>{nn++;
+      nbody.appendChild(el("div","trow",`<span class="name">${esc(n)}</span><span>${esc(nevTxt(B1,n,true))}</span><span>${esc(nevTxt(B2,n,true))}</span><span class="tt">${esc(nevTotTxt(nevUnits(B1,n)+nevUnits(B2,n),n))}</span>`));});
   });
-  sn.innerHTML=shead("Neveras","Suma del último envío de cada barra",nn);
+  sn.innerHTML=shead("Neveras","Suma de las dos barras · c = cajas, el resto sueltas",nn);
   sn.appendChild(nn?nbody:el("div","empty",(R1||R2)?"Los últimos envíos de las barras no tienen neveras.":"Todavía no se ha enviado ninguna barra."));
   v.appendChild(sn);
   // Notas
