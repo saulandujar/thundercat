@@ -372,6 +372,8 @@ header:hover .logo{transform:rotate(-6deg) scale(1.06)}
 .btlpop{animation:btlpop .35s cubic-bezier(.3,1.7,.5,1)}
 @keyframes btlpop{0%{transform:scale(.9)}60%{transform:scale(1.07)}100%{transform:none}}
 /* ---- Pedido, consumo y recordatorio ---- */
+.willorder{display:block;margin-top:3px;font-family:var(--cond);font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:.03em;color:var(--muted)}
+.willorder.yes{color:var(--accent)}
 header h1{font-size:clamp(28px,9.5vw,46px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
 header .htext{min-width:0}
 .tabs4 button{font-size:17px;padding:0 1px;letter-spacing:.02em;min-width:0}
@@ -1782,8 +1784,10 @@ async function buildPedidoXlsx(qtys){
   for(const l of PED.lines){
     const q=+(qtys[l.name]||0);
     x=setCellValue(x,"D"+l.row,q||null);
-    F[l.row]=(l.precio+l.precio*l.iva)*q;
-    if(l.f) x=setCached(x,"F"+l.row,F[l.row]);
+    const noSuma=/^FRUTAS/i.test(l.sup);  /* las frutas van al Excel pero no cuentan en el total */
+    F[l.row]=noSuma?0:(l.precio+l.precio*l.iva)*q;
+    if(noSuma){}
+    else if(l.f) x=setCached(x,"F"+l.row,F[l.row]);
     else x=setFormula(x,"F"+l.row,`(C${l.row}+(C${l.row}*E${l.row}))*D${l.row}`,F[l.row]); /* la hoja original tenía 0 fijo: se pone la fórmula */
   }
   for(const t of PED.tots){
@@ -1803,7 +1807,7 @@ function startPedidos(db){
   try{db.collection("pedidos").orderBy("ts","desc").limit(80).onSnapshot(qs=>{PEDS=qs.docs.map(d=>Object.assign({id:d.id},d.data())); if(V.screen==="encargado") softRender();},()=>{});}catch(e){}
 }
 function pedGet(name){return (C.ped&&C.ped[name])||{};}
-function pedSet(name,patch){C.ped=C.ped||{}; C.ped[name]=Object.assign({},C.ped[name]||{},patch); for(const k in C.ped[name]) if(C.ped[name][k]==null) delete C.ped[name][k]; syncConf(); render();}
+function pedSet(name,patch){if(["min","ideal","lvl","kg","link","pack"].some(k=>k in patch)&&C.pedOv&&C.pedOv[name]!=null) delete C.pedOv[name]; C.ped=C.ped||{}; C.ped[name]=Object.assign({},C.ped[name]||{},patch); for(const k in C.ped[name]) if(C.ped[name][k]==null) delete C.ped[name][k]; syncConf(); render();}
 function pedLinks(l){const s=pedGet(l.name); return Array.isArray(s.link)?s.link:((PED_DEF[l.name]||{}).link||[]);}
 function pedPack(l){const s=pedGet(l.name); if(s.pack) return s.pack; const d=PED_DEF[l.name]||{}; if(d.pack) return d.pack; const m=/caja\s*(\d+)/i.exec(l.fmt); return m?+m[1]:/caja/i.test(l.fmt)?24:1;}
 function pedUnit(l,n){const f=l.fmt.toLowerCase(); const pl=n!==1;
@@ -1863,7 +1867,7 @@ function pedSuggest(l,st,lv){
 function pedQty(l,st,lv){const ov=C.pedOv&&C.pedOv[l.name]; return ov!=null?ov:pedSuggest(l,st,lv);}
 function pedRows(S){
   return PED.lines.map(l=>{const lvl=isLevelLine(l), lv=lvl?levelFor(l,S):undefined, st=lvl?null:stockFor(l,S), s=pedGet(l.name); const q=pedQty(l,st,lv);
-    return {l,st,lv,lvl,s,q,low:lvl?(!!lv&&lv<=(s.lvl!=null?s.lvl:2)):(st!=null&&s.min!=null&&st<s.min),manual:!!(C.pedOv&&C.pedOv[l.name]!=null),eur:q*(l.precio+l.precio*l.iva)};});
+    return {l,st,lv,lvl,s,q,low:lvl?(!!lv&&lv<=(s.lvl!=null?s.lvl:2)):(st!=null&&s.min!=null&&st<s.min),manual:!!(C.pedOv&&C.pedOv[l.name]!=null),eur:/^FRUTAS/i.test(l.sup)?0:q*(l.precio+l.precio*l.iva)};});
 }
 function pedLowCount(){const S=snapAt(Infinity,0); return pedRows(S).filter(r=>r.low).length;}
 
@@ -1873,9 +1877,9 @@ function renderPedido(v){
   const anyMin=rows.some(r=>r.s.min!=null||r.s.ideal!=null);
   // Resumen
   const sum=el("section","pedsum");
-  sum.innerHTML=`<div class="pedbig"><div><b>${toOrder.length}</b><span>productos a pedir</span></div><div><b>${total.toLocaleString("es-ES",{maximumFractionDigits:0})} €</b><span>aprox. con IVA</span></div><div class="${low.length?"bad":""}"><b>${low.length}</b><span>bajo mínimo</span></div></div>
+  sum.innerHTML=`<div class="pedbig"><div><b>${toOrder.length}</b><span>productos a pedir</span></div><div><b>${total.toLocaleString("es-ES",{maximumFractionDigits:0})} €</b><span>aprox. con IVA</span></div><div class="${low.length?"bad":""}"><b>${low.length}</b><span>por debajo del límite</span></div></div>
     <p class="pedsrc">Stock según los últimos envíos: ${[["Almacén",S.RA],["B1",S.R1],["B2",S.R2]].map(([t,r])=>`${t} ${r?esc(fmtTs(r.ts)):"—"}`).join(" · ")}</p>`;
-  if(!anyMin) sum.appendChild(el("div","confirm","<span>👉 Pulsa <b>✎ Mínimos</b> y pon el mínimo y el ideal de cada producto. Así la app calcula sola lo que hay que pedir.</span>"));
+  if(!anyMin) sum.appendChild(el("div","confirm","<span>👉 Pulsa <b>✎ Cantidades</b> y pon cuánto quieres tener de cada producto. Así la app calcula sola lo que hay que pedir.</span>"));
   const acts=el("div","pedacts");
   const dl=el("button","primary","⬇ Descargar Excel"); dl.type="button"; dl.onclick=()=>downloadPedido(rows);
   const mk=el("button","sec","✓ Marcar como pedido"); mk.type="button"; mk.onclick=()=>marcarPedido(rows);
@@ -1886,7 +1890,7 @@ function renderPedido(v){
   v.appendChild(sum);
   // Filtros
   const tb=el("div","tchips");
-  [["need","Lo que hay que pedir"],["all","Todo"],["edit","✎ Mínimos"]].forEach(([k,lbl])=>{const b=el("button","chip"+((V.pedMode||"need")===k?" on":""),lbl); b.type="button"; b.onclick=()=>{V.pedMode=k; render();}; tb.appendChild(b);});
+  [["need","Lo que hay que pedir"],["all","Todo"],["edit","✎ Cantidades"]].forEach(([k,lbl])=>{const b=el("button","chip"+((V.pedMode||"need")===k?" on":""),lbl); b.type="button"; b.onclick=()=>{V.pedMode=k; render();}; tb.appendChild(b);});
   v.appendChild(tb);
   const mode=V.pedMode||"need";
   if(mode==="edit") return renderPedEdit(v,rows);
@@ -1897,23 +1901,23 @@ function renderPedido(v){
     rs.forEach(r=>{shown++;
       const unit=pedUnit(r.l,r.st);
       const info=r.lvl?(r.lv?`nivel ${r.lv}/5 · ${LEVELS[r.lv]}`:"sin marcar en el almacén"):r.st==null?"sin enlazar con el inventario":`hay ${fmtQ(r.st)} ${unit}`;
-      const lim=r.lvl?(r.s.kg!=null?`se piden ${fmtQ(r.s.kg)} ${unit} si nivel ≤ ${r.s.lvl!=null?r.s.lvl:2}`:"pon la cantidad en ✎ Mínimos"):[r.s.min!=null?"mín "+fmtQ(r.s.min):"",r.s.ideal!=null?"ideal "+fmtQ(r.s.ideal):""].filter(Boolean).join(" · ");
+      const lim=r.lvl?(r.s.kg!=null?`se piden ${fmtQ(r.s.kg)} ${unit} si nivel ≤ ${r.s.lvl!=null?r.s.lvl:2}`:"pon la cantidad en ✎ Cantidades"):[r.s.ideal!=null?"quieres "+fmtQ(r.s.ideal):"",r.s.min!=null?"pide si baja de "+fmtQ(r.s.min):""].filter(Boolean).join(" · ");
       const row=el("div","row prow"+(r.q>0?" set":"")+(r.low?" low":""),`<div class="name">${esc(niceName(r.l.name))}<small class="upd">${esc(info)}${lim?" · "+esc(lim):""}${r.manual?" · ✎ a mano":""}</small></div>`);
       row.appendChild(stepper(r.q,1,"ped-"+r.l.row,"Pedir "+r.l.name,n=>{C.pedOv=C.pedOv||{}; if(n===pedSuggest(r.l,r.st,r.lv)) delete C.pedOv[r.l.name]; else C.pedOv[r.l.name]=n; syncConf(); render();}));
       s.appendChild(row);
     });
     v.appendChild(s);
   });
-  if(!shown) v.appendChild(el("div","empty big",anyMin?"No hace falta pedir nada 🎉":"Todavía no hay mínimos puestos."));
+  if(!shown) v.appendChild(el("div","empty big",anyMin?"No hace falta pedir nada 🎉":"Todavía no has puesto cantidades. Pulsa ✎ Cantidades."));
 }
 function numInput(id,val,ph,onSet){
   const i=document.createElement("input"); i.type="text"; i.inputMode="decimal"; i.id=id; i.className="numin"; i.placeholder=ph; i.value=val!=null?fmtQ(val):""; i.autocomplete="off";
   i.onchange=()=>{const t=i.value.trim(); onSet(t===""?null:Math.max(0,parseQty(t)));};
-  i.onfocus=()=>i.select(); return i;
+  i.onfocus=()=>i.select(); i.onkeydown=e=>{if(e.key==="Enter") i.blur();}; i.enterKeyHint="done"; return i;
 }
 function renderPedEdit(v,rows){
   const cons=consumoData();
-  const help=el("div","confirm","<span><b>Mínimo</b>: si hay menos, se pide. <b>Ideal</b>: lo que se quiere tener; se pide hasta llegar ahí. Déjalos vacíos en lo que no quieras pedir con la app.</span>");
+  const help=el("div","confirm","<span>Pon en <b>Quiero tener</b> la cantidad que quieres para el finde. La app pide lo que falte: si quieres 20 y hay 2, pide <b>18</b>, y lo pone sola en el Excel.<br><small>Opcional: <b>Pedir si baja de</b> sirve para no pedir cuando aún queda bastante (por ejemplo, quiero 20 pero solo pido si baja de 10). Si lo dejas vacío, siempre se repone hasta lo que quieres tener.</small></span>");
   v.appendChild(help);
   if(cons&&cons.weeks.length>=2){
     const b=el("button","sec","Rellenar ideales vacíos con el consumo"); b.type="button";
@@ -1922,16 +1926,16 @@ function renderPedEdit(v,rows){
   }
   const names=allProductNames();
   PED.sups.forEach(sup=>{
-    const s=el("section",null,shead(niceName(sup==="DAMM"?"Damm":sup),"Mínimo · Ideal · Enlace con el inventario",0));
+    const s=el("section",null,shead(niceName(sup==="DAMM"?"Damm":sup),"Quiero tener · Pedir si baja de · Enlace",0));
     rows.filter(r=>r.l.sup===sup).forEach(r=>{
       const l=r.l, row=el("div","pedit");
-      row.appendChild(el("div","name",`${esc(niceName(l.name))}<small class="upd">${esc(l.fmt.toLowerCase())}${r.lvl?(r.lv?" · nivel "+r.lv+"/5":""):r.st!=null?" · hay "+fmtQ(r.st):""}</small>`));
+      row.appendChild(el("div","name",`${esc(niceName(l.name))}<small class="upd">${esc(l.fmt.toLowerCase())}${r.lvl?(r.lv?" · nivel "+r.lv+"/5":""):r.st!=null?" · hay "+fmtQ(r.st):""}</small>${(r.s.min!=null||r.s.ideal!=null||r.s.kg!=null)?`<small class="willorder${r.q>0?" yes":""}">${r.q>0?"→ se pedirán "+fmtQ(r.q)+" "+esc(pedUnit(l,r.q)):"→ ahora no hace falta pedir"}${r.manual?" (puesto a mano)":""}</small>`:""}`));
       const nums=el("div","pnums");
       const lab=(t,inp)=>{const w=el("label","pnum",`<span>${t}</span>`); w.appendChild(inp); return w;};
       if(r.lvl){
         nums.append(lab("Pedir si nivel ≤",numInput("pv-"+l.row,r.s.lvl!=null?r.s.lvl:2,"2",x=>pedSet(l.name,{lvl:x==null?null:Math.max(1,Math.min(5,Math.round(x)))}))),
                     lab("Cantidad ("+pedUnit(l,2)+")",numInput("pk-"+l.row,r.s.kg,"—",x=>pedSet(l.name,{kg:x}))));
-      } else nums.append(lab("Mín",numInput("pm-"+l.row,r.s.min,"—",x=>pedSet(l.name,{min:x}))),lab("Ideal",numInput("pi-"+l.row,r.s.ideal,"—",x=>pedSet(l.name,{ideal:x}))));
+      } else nums.append(lab("Quiero tener",numInput("pi-"+l.row,r.s.ideal,"—",x=>pedSet(l.name,{ideal:x}))),lab("Pedir si baja de",numInput("pm-"+l.row,r.s.min,"opcional",x=>pedSet(l.name,{min:x}))));
       if(!/^kg/i.test(l.fmt)&&!/^barril/i.test(l.fmt)) nums.appendChild(lab("Uds/caja",numInput("pp-"+l.row,pedPack(l),"1",x=>pedSet(l.name,{pack:x&&x>0?x:null}))));
       row.appendChild(nums);
       const links=pedLinks(l), lk=el("div","plinks");
@@ -2165,7 +2169,7 @@ function renderEncargado(v){
   if(V.etab==="consumo") return renderConsumo(v);
   const cut=totalCutoff();
   const nl=pedLowCount();
-  if(nl){const a=el("div","remind",`<span>🛒 <b>${nl} producto${nl===1?"":"s"} por debajo del mínimo.</b></span>`); const b=el("button","primary","Ver pedido"); b.type="button"; b.onclick=()=>{V.etab="pedido"; render();}; a.appendChild(b); v.appendChild(a);}
+  if(nl){const a=el("div","remind",`<span>🛒 <b>${nl} producto${nl===1?"":"s"} por debajo del límite.</b></span>`); const b=el("button","primary","Ver pedido"); b.type="button"; b.onclick=()=>{V.etab="pedido"; render();}; a.appendChild(b); v.appendChild(a);}
   resetBar(v,cut);
   const last=k=>REG.find(r=>r.area===k&&r.data&&r.ts>=cut)||null;
   const RA=last("alm"), R1=last("b1"), R2=last("b2");
